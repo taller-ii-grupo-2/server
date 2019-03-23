@@ -8,3 +8,6 @@ def hello_android():
 @app.route('/web_admin')
 def hello_admin():
     return 'Hello, Admin!'
+
+if __name__ == '__main__':
+    app.run()
