@@ -3,5 +3,5 @@ Flask==1.0.2
 itsdangerous==1.1.0
 Jinja2==2.10
 MarkupSafe==1.1.1
-pyspark==2.1.0+hadoop2.7
+pyspark>=2.2.2+hadoop2.7
 Werkzeug==0.15.1
