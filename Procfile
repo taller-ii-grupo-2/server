@@ -1,1 +1,1 @@
-web: gunicorn src/main:app
+web: gunicorn --ch-dir src main:app
