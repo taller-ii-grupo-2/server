@@ -1,1 +1,1 @@
-web: gunicorn --chdir src main:app
+web: gunicorn --chdir src/hypechat main:app
