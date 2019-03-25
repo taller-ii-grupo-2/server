@@ -23,12 +23,12 @@ class Name(db.Model):
 
     def add_name(name, last_name):
         try:
-        name=Name(
-            name=name,
-            last_name=last_name
-        )
-        db.session.add(name)
-        db.session.commit()
-        return "Name added. name id={}".format(name.id)
-    except Exception as e:
-        return(str(e))
+            name=Name(
+                name=name,
+                last_name=last_name
+            )
+            db.session.add(name)
+            db.session.commit()
+            return "Name added. name id={}".format(name.id)
+        except Exception as e:
+            return(str(e))

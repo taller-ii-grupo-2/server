@@ -1,6 +1,7 @@
 from flask import Flask
-import flask_sqlalchemy
+from flask_sqlalchemy import SQLAlchemy
 import config
+import os
 
 DATABASE_CONNECTION_URI = \
     'postgresql+psycopg2://{user}:{passwd}@{host}:{port}/{db}'.format(

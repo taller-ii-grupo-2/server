@@ -21,7 +21,7 @@ def hello():
 def add_name():
     name=request.args.get('name')
     last_name=request.args.get('last_name')
-    Name.add_name(name,last_name)
+    return Name.add_name(name,last_name)
 
 @app.route("/getall")
 def get_all():

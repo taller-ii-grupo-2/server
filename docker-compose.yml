@@ -13,5 +13,5 @@ services:
   db:
     image: postgres:latest
     env_file: .env
-    expose:
-      - 5432
+    ports:
+     - 5432
