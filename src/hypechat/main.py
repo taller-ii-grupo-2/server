@@ -1,7 +1,6 @@
 import time
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from init import app
-import config
 from models import Name
 
 @app.route('/android')
