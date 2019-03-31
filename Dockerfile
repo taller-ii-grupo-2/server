@@ -5,7 +5,6 @@ EXPOSE 5000
 COPY . .
 RUN pip install -r requirements.txt
 RUN chmod +x src/hypechat/manage.py
-ARG APP_SETTINGS=config.ProductionConfig
 
 # Make Entrypoint executable
 RUN chmod +x docker-entrypoint.sh
