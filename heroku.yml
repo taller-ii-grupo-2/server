@@ -1,26 +1,16 @@
 version: '3'
-services:
-  web:
-    build: .
-    ports:
-     - "5000:5000"
-    environment:
-      APP_SETTINGS: config.ProductionConfig
-      DATABASE_URL: postgresql+psycopg2://postgres:postgres@server_db_1:5432/testdb
-    depends_on:
-      - db
-    volumes:
-     - .:/code
+setup:
+  addons:
+    - plan: heroku-postgresql
+    as: db
+  config:
+    APP_SETTINGS: config.ProductionConfig
 
-  db:
-    image: postgres:latest
-    env_file: .env
-    expose:
-    -  5432
-    volumes:
-    - db_volume:/var/lib/postgresql
+build:
+  docker:
+    web: Dockerfile
+  config:
+    APP_SETTINGS: config.ProductionConfig
 
-volumes:
-  db_volume:
 
 
