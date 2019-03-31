@@ -2,12 +2,12 @@ setup:
   addons:
     - plan: heroku-postgresql
     as: db
-  config:
-    APP_SETTINGS: config.ProductionConfig
 
 build:
   docker:
     web: Dockerfile
+  config:
+    APP_SETTINGS: config.ProductionConfig
 
 
 
