@@ -1,7 +1,7 @@
 setup:
   addons:
     - plan: heroku-postgresql
-    as: db
+      as: db
   environment:
     .env
 
