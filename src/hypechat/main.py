@@ -6,6 +6,7 @@ from flask import request, jsonify
 from sqlalchemy import exc
 # pylint: disable = no-name-in-module
 from __init__ import app
+# pylint: disable = import-error
 from models import Name
 
 
