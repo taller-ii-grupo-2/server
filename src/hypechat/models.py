@@ -2,8 +2,7 @@
 Define models used in the server
 """
 from sqlalchemy import exc
-# pylint: disable = no-name-in-module
-from __init__ import db
+from hypechat.__init__ import db
 
 
 # pylint: disable = missing-docstring

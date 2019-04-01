@@ -3,7 +3,6 @@ db manager
 """
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-# pylint: disable = no-name-in-module
 from __init__ import app, db
 
 # pylint: disable = invalid-name
