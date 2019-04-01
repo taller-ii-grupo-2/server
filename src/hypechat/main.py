@@ -4,6 +4,7 @@ Main module of the server app.
 import os
 from flask import request, jsonify
 from sqlalchemy import exc
+# pylint: disable = no-name-in-module
 from __init__ import app
 from hypechat.models import Name
 
