@@ -1,6 +1,6 @@
-if [ ! -d "migrations" ]; then
+#if [ ! -d "migrations" ]; then
 python /code/src/hypechat/manage.py db init
-fi
+#fi
 
 python /code/src/hypechat/manage.py db migrate
 python /code/src/hypechat/manage.py db upgrade
