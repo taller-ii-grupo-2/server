@@ -4,7 +4,6 @@ Define models used in the server
 from sqlalchemy import exc
 from hypechat.__init__ import db
 
-
 # pylint: disable = missing-docstring
 class Name(db.Model):
     __tablename__ = 'names'
