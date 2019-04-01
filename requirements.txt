@@ -1,5 +1,5 @@
 Flask==1.0.2
-Flask_SQLAlchemy
+flask_sqlalchemy
 flask_script
 flask_migrate
 psycopg2-binary==2.7.7
