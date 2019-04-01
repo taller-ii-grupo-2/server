@@ -31,4 +31,4 @@ class Name(db.Model):
             db.session.commit()
             return "Name added. name id={}".format(name.id)
         except Exception as e:
-            return(str(e))
+            return("error in models.py, add_name" +  str(e))
