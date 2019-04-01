@@ -7,5 +7,3 @@ gunicorn==19.9.0
 coveralls==1.7.0
 pylint==2.3.1
 pytest==4.3.1
-pytest-cov
-flake8
