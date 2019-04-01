@@ -21,7 +21,7 @@ class Name(db.Model):
             'last_name': self.last_name,
         }
 
-    def add_name(name, last_name):
+    def add_name(self, name, last_name):
         try:
             name=Name(
                 name=name,
