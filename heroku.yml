@@ -7,7 +7,7 @@ setup:
 
 build:
   docker:
-    web: Dockerfile
+    web: Dockerfile-heroku
   config:
     APP_SETTINGS: config.ProductionConfig
 
