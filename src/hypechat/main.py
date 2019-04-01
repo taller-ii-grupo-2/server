@@ -1,19 +1,14 @@
 import time
-import os
 from flask import Flask, request, jsonify
 from init import app
 from models import Name
 
-
 @app.route('/android')
 def hello_android():
-    """Returns msg for android endpoint."""
     return 'Hello, Android!'
-
 
 @app.route('/web_admin')
 def hello_admin():
-    """ returns msg for web admin endpoint.  """
     return 'Hello, Admin!'
 
 @app.route('/')
