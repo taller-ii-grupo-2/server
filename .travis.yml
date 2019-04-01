@@ -3,12 +3,6 @@ language: python
 python:
   - "3.6"
 
-services:
-  - docker
-
-before install:
-  - docker-compose up
-
 script: 
   - sh scripts/tests.sh
   - sh scripts/pylint.sh
