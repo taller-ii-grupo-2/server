@@ -4,7 +4,7 @@ Main module of the server app.
 import os
 from flask import request, jsonify
 from sqlalchemy import exc
-from hypechat.__init__ import app
+from __init__ import app
 from hypechat.models import Name
 
 

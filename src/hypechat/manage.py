@@ -3,7 +3,7 @@ db manager
 """
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from hypechat.__init__ import app, db
+from __init__ import app, db
 
 # pylint: disable = invalid-name
 manager = Manager(app)
