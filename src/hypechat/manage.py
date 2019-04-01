@@ -1,14 +1,12 @@
-"""
-db manager
-"""
+import os
 from flask_script import Manager
 from flask_migrate import Migrate, MigrateCommand
-from hypechat.__init__ import app, db
+from init import app,db
 
-# pylint: disable = invalid-name
 manager = Manager(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
+from models import Name
 
 
 if __name__ == '__main__':
