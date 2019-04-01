@@ -9,6 +9,8 @@ services:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@server_db_1:5432/testdb
     depends_on:
       - db
+    links:
+      - db
     volumes:
      - .:/code
 
