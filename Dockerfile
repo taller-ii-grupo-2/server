@@ -3,4 +3,4 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
 ENV FLASK_ENV=development
-CMD ["/bin/bash", "docker-entry-point.sh"]
+CMD ["python", "main.py"]
