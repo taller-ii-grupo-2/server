@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile
   config:
-    FLASK_ENV=development
+    FLASK_ENV: production
