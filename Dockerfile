@@ -3,4 +3,4 @@ ADD . /code
 WORKDIR /code
 RUN pip install -r requirements.txt
 ENV FLASK_ENV=development
-CMD ["python", "main.py"]
+CMD ["bash", "scripts/wsgi.sh"]
