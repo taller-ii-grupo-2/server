@@ -3,3 +3,5 @@ build:
     web: Dockerfile-heroku
   config:
     FLASK_ENV: production
+run:
+  web: gunicorn app:app
