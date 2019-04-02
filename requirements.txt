@@ -1,4 +1,1 @@
 flask
-# flask-sqlalchemy
-# flask-migrate
-gunicorn
