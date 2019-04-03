@@ -6,7 +6,7 @@ from app import app,db
 manager = Manager(app)
 migrate = Migrate(app, db)
 manager.add_command('db', MigrateCommand)
-from models import User
+from models import Name
 
 
 if __name__ == '__main__':

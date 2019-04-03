@@ -1,19 +1,19 @@
 from app import db
 
-class User(db.Model):
-    __table_args__ = {'extend_existing': True}
+class Name(db.Model):
+    __tablename__ = 'names'
+
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64), index=True, unique=True)
-    email = db.Column(db.String(120), index=True, unique=True)
-    password_hash = db.Column(db.String(128))
+    name = db.Column(db.String())
+    last_name = db.Column(db.String())
 
+    def __init__(self, name, last_name):
+        self.name = name
+        self.last_name = last_name
+        
     def __repr__(self):
-        return '<User {}>'.format(self.username)
-
-    def __init__(self, username, email):
-        self.username = username
-        self.email = email
-
+        return '<id {}>'.format(self.id)
+    
     def serialize(self):
         return {
             'id': self.id, 
@@ -21,14 +21,14 @@ class User(db.Model):
             'last_name': self.last_name,
         }
 
-    def add_name(self, username, email):
+    def add_name(name, last_name):
         try:
-            user=User(
-                username=username,
-                email=email
+            name=Name(
+                name=name,
+                last_name=last_name
             )
-            db.session.add(user)
+            db.session.add(name)
             db.session.commit()
-            return "User added. user id={}".format(user.id)
+            return "Name added. name id={}".format(name.id)
         except Exception as e:
             return(str(e))

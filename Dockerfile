@@ -1,7 +1,11 @@
 FROM python:3.6.8
 ADD . /code
 WORKDIR /code
+EXPOSE 5000
+COPY . .
 RUN pip install -r requirements.txt
+RUN chmod +x app/manage.py
+ARG APP_SETTINGS=config.ProductionConfig
 ENV FLASK_ENV=development
 ENV FLASK_APP=app
 CMD ["bash", "db_setup.sh"]
