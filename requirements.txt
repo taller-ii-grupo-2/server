@@ -1,11 +1,6 @@
-Flask==1.0.2
-Flask_SQLAlchemy
-flask_script
-flask_migrate
-psycopg2-binary==2.7.7
-gunicorn==19.9.0
-coveralls==1.7.0
-pylint==2.3.1
-pytest==4.3.1
-pytest-cov
-flake8
+flask
+flask-sqlalchemy
+flask-migrate
+flask-script
+psycopg2-binary
+gunicorn
