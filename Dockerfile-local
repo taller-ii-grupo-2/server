@@ -4,7 +4,7 @@ WORKDIR /code
 EXPOSE 5000
 COPY . .
 RUN pip install -r requirements.txt
-RUN chmod +x app/manage.py
+RUN chmod +x manage.py
 ARG APP_SETTINGS=config.ProductionConfig
 ENV FLASK_ENV=development
 ENV FLASK_APP=app

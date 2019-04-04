@@ -1,4 +1,4 @@
-python /code/app/manage.py db init
+python /code/manage.py db init
 chmod -R 777 migrations
-python /code/app/manage.py db migrate
-python /code/app/manage.py db upgrade
+python /code/manage.py db migrate
+python /code/manage.py db upgrade
