@@ -1,7 +1,6 @@
 from app import app
 from app.models import Name
-from flask import jsonify
-import requests
+from flask import request,jsonify
 
 @app.route('/')
 @app.route('/index')

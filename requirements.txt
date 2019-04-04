@@ -4,4 +4,3 @@ flask-migrate
 flask-script
 psycopg2-binary
 gunicorn
-requests
