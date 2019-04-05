@@ -6,7 +6,7 @@ psycopg2-binary
 gunicorn
 pylint
 flake8
-pytest
+pytest==4.3.1
 pytest-cov
 pylint-flask
-coveralls
+coveralls==1.7.0
