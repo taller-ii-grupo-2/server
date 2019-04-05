@@ -8,3 +8,5 @@ pylint
 flake8
 pytest
 pytest-cov
+pylint-flask
+coveralls
