@@ -4,3 +4,9 @@ flask-migrate
 flask-script
 psycopg2-binary
 gunicorn
+pylint
+flake8
+pytest==4.3.1
+pytest-cov
+pylint-flask
+coveralls==1.7.0
