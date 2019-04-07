@@ -9,6 +9,6 @@ build:
   config:
     FLASK_ENV: production
 
-# release:
-#   command: ./db_setup.sh
-#   image: web
+release:
+  command: ./db_setup.sh
+  image: web
