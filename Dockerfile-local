@@ -5,7 +5,6 @@ EXPOSE 5000
 COPY . .
 RUN pip install -r requirements.txt
 RUN chmod +x manage.py
-ARG APP_SETTINGS=config.DevelopmentConfig
 ENV FLASK_ENV=development
 ENV FLASK_APP=app
 CMD ["bash", "scripts/local.sh"]

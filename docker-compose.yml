@@ -8,6 +8,7 @@ services:
      - "5000:5000"
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@server_db_1:5432/testdb
+      APP_SETTINGS: config.DevelopmentConfig
     depends_on:
       - db
     volumes:
