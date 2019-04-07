@@ -10,6 +10,7 @@ def index():
     """home endpoint"""
     return "Hello, World!"
 
+
 @app.route('/android')
 def android():
     """home endpoint"""
@@ -29,8 +30,8 @@ def get_all():
 @app.route("/add")
 def add_user():
     """add a name boject to db"""
-    name=request.args.get('name')
-    last_name=request.args.get('last_name')
-    age=request.args.get('age')
-    mail=request.args.get('mail')
-    return User.add_user(name,last_name,age,mail)
+    name = request.args.get('name')
+    last_name = request.args.get('last_name')
+    age = request.args.get('age')
+    mail = request.args.get('mail')
+    return User.add_user(name, last_name, age, mail)

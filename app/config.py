@@ -9,19 +9,24 @@ class Config():
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
+
 class ProductionConfig(Config):
+    """Production class for config."""
     DEBUG = False
 
 
 class StagingConfig(Config):
+    """Staging class for config."""
     DEVELOPMENT = True
     DEBUG = True
 
 
 class DevelopmentConfig(Config):
+    """Development class for config."""
     DEVELOPMENT = True
     DEBUG = True
 
 
 class TestingConfig(Config):
+    """Testing class for config."""
     TESTING = True
