@@ -34,4 +34,5 @@ def add_user():
     last_name = request.args.get('last_name')
     age = request.args.get('age')
     mail = request.args.get('mail')
-    return User.add_user(name, last_name, age, mail)
+    pais = request.args.get('pais')
+    return User.add_user(name, last_name, age, mail, pais)
