@@ -11,5 +11,5 @@ build:
 
 release:
   command: 
-    - ./db_setup.sh
+    - bash db_setup.sh
   image: web
