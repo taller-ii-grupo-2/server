@@ -8,5 +8,5 @@ RUN chmod +x manage.py
 ARG APP_SETTINGS=config.ProductionConfig
 ENV FLASK_ENV=production
 ENV FLASK_APP=app
-RUN heroku bash db_setup.sh
+RUN bash db_setup.sh
 CMD ["bash", "scripts/wsgi.sh"]
