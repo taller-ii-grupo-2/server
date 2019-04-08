@@ -23,5 +23,6 @@ services:
     volumes:
     - db_volume:/var/lib/postgresql
 
+
 volumes:
   db_volume:
