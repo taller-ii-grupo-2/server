@@ -15,4 +15,3 @@ dist/
 build/
 *.egg-info/
 
-migrations/
