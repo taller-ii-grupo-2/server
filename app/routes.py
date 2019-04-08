@@ -29,10 +29,11 @@ def get_all():
 
 @app.route("/add")
 def add_user():
-    """add a name boject to db"""
+    """add object to db"""
     name = request.args.get('name')
     last_name = request.args.get('last_name')
     age = request.args.get('age')
     mail = request.args.get('mail')
     pais = request.args.get('pais')
-    return User.add_user(name, last_name, age, mail, pais)
+    token = request.args.get('token')
+    return User.add_user(name, last_name, age, mail, pais, token)
