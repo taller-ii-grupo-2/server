@@ -36,4 +36,5 @@ def add_user():
     mail = request.args.get('mail')
     pais = request.args.get('pais')
     token = request.args.get('token')
-    return User.add_user(name, last_name, age, mail, pais, token)
+    height = request.args.get('height')
+    return User.add_user(name, last_name, age, mail, pais, token, height)
