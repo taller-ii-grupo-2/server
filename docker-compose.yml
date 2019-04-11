@@ -1,4 +1,5 @@
 version: '3'
+
 services:
   web:
     build:
@@ -8,6 +9,7 @@ services:
      - "5000:5000"
     environment:
       DATABASE_URL: postgresql+psycopg2://postgres:postgres@server_db_1:5432/testdb
+      APP_SETTINGS: config.DevelopmentConfig
     depends_on:
       - db
     volumes:
@@ -20,6 +22,7 @@ services:
     -  5432
     volumes:
     - db_volume:/var/lib/postgresql
+
 
 volumes:
   db_volume:

@@ -6,7 +6,6 @@ COPY . .
 RUN pip install -r requirements.txt
 RUN chmod +x manage.py
 ARG APP_SETTINGS=config.ProductionConfig
-ENV FLASK_ENV=development
+ENV FLASK_ENV=production
 ENV FLASK_APP=app
-CMD ["bash", "db_setup.sh"]
 CMD ["bash", "scripts/wsgi.sh"]

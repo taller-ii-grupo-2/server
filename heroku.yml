@@ -8,3 +8,8 @@ build:
     web: Dockerfile
   config:
     FLASK_ENV: production
+
+release:
+  command: 
+    - bash db_setup.sh
+  image: web
