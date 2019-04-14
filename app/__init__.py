@@ -9,7 +9,7 @@ app.config.from_object(Config)
 db = SQLAlchemy(app)
 api = Api(app)
 
-from app import routes, models  # noqa: E402, F401
+from app import routes, users  # noqa: E402, F401
 
 api.add_resource(routes.Index, '/')
 api.add_resource(routes.Android, '/android')

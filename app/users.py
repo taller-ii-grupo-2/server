@@ -9,23 +9,15 @@ class User(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String())
-    last_name = db.Column(db.String())
-    age = db.Column(db.Integer())
     mail = db.Column(db.String())
-    pais = db.Column(db.String())
-    token = db.Column(db.String())
-    height = db.Column(db.String())
+    password = db.Column(db.String())
 
     # pylint: disable = R0913
-    def __init__(self, name, last_name, age, mail, pais, token, height):
+    def __init__(self, name, mail, password):
         """ initializes table """
         self.name = name
-        self.last_name = last_name
-        self.age = age
         self.mail = mail
-        self.pais = pais
-        self.token = token
-        self.height = height
+        self.password = password
 
     def __repr__(self):
         """ assigns id"""
@@ -36,27 +28,19 @@ class User(db.Model):
         return {
             'id': self.id,
             'name': self.name,
-            'last_name': self.last_name,
-            'age': self.age,
             'mail': self.mail,
-            'pais': self.pais,
-            'token': self.token,
-            'height': self.height
+            'password': self.password
         }
 
     # pylint: disable = R0913
     @staticmethod
-    def add_user(name, last_name, age, mail, pais, token, height):
+    def add_user(name, mail, password):
         """ adds user to table """
         try:
             user = User(
                 name=name,
-                last_name=last_name,
-                age=age,
                 mail=mail,
-                pais=pais,
-                token=token,
-                height=height
+                password=password
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
