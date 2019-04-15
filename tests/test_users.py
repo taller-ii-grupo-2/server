@@ -1,5 +1,5 @@
-from .. import User
-from .app.exceptions import InvalidMail
+from app.users import User
+from app.exceptions import InvalidMail
 import unittest
 
 class  AddUsersTest(unittest.TestCase):
