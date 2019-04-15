@@ -1,5 +1,7 @@
 """Module defining all models needed to define the db tables."""
 import sqlalchemy.exc as sql
+from sqlalchemy.orm import validates
+import re
 from app import db
 
 
@@ -8,9 +10,9 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String())
-    mail = db.Column(db.String())
-    password = db.Column(db.String())
+    name = db.Column(db.String(), unique=True, nullable=False)
+    mail = db.Column(db.String(), unique=True, nullable=False)
+    password = db.Column(db.String(), nullable=False)
 
     # pylint: disable = R0913
     def __init__(self, name, mail, password):
@@ -47,3 +49,12 @@ class User(db.Model):
             return "User added. user id={}".format(user.id)
         except sql.DataError as error:
             return str(error)
+
+    
+    @validates('email')
+    def validate_email(self, mail):
+        match = re.fullmatch( r'/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/', mail)
+        if not match:
+            raise InvalidMail
+        else:
+            return address
