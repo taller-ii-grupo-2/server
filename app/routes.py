@@ -2,6 +2,7 @@
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
+from app.exceptions import InvalidMail, SignedMail
 
 
 class Index(Resource):
@@ -37,7 +38,18 @@ class AddUsers(Resource):
     @classmethod
     def post(cls):
         """post method"""
-        name = request.args.get('name')
-        mail = request.args.get('mail')
-        password = request.args.get('password')
-        return User.add_user(name, mail, password)
+        content = request.get_json()
+        name = content['name']
+        mail = content['mail']
+        password = content['password']
+        try:
+            user = User.add_user(name, mail, password)
+            data = {'id': user.id,
+                    'message': 'User added.'
+                    }
+            response = jsonify(data)
+            response.status_code = 200
+        except (InvalidMail, SignedMail) as error:
+            response = jsonify(error.message)
+            response.status_code = 400
+        return response

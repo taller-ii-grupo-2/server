@@ -1,8 +1,10 @@
-"""Module defining all models needed to define the db tables."""
+"""Module defining users model needed to define the db table."""
+import re
 import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
-import re
+from passlib.hash import pbkdf2_sha256 as sha256
 from app import db
+from app.exceptions import InvalidMail, SignedMail
 
 
 class User(db.Model):
@@ -10,7 +12,7 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), unique=True, nullable=False)
+    name = db.Column(db.String(), nullable=False)
     mail = db.Column(db.String(), unique=True, nullable=False)
     password = db.Column(db.String(), nullable=False)
 
@@ -42,19 +44,42 @@ class User(db.Model):
             user = User(
                 name=name,
                 mail=mail,
-                password=password
+                password=User.generate_hash(password)
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
-            return "User added. user id={}".format(user.id)
-        except sql.DataError as error:
-            return str(error)
+        except (sql.DataError, InvalidMail, SignedMail) as error:
+            raise error
+        return user
 
-    
-    @validates('email')
-    def validate_email(self, mail):
-        match = re.fullmatch( r'/\A[\w+\-.]+@[a-z\d\-]+(\.[a-z\d\-]+)*\.[a-z]+\z/', mail)
+    @validates('mail')
+    # pylint: disable = unused-argument
+    # pylint: disable = no-self-use
+    def validate_email(self, key, mail):
+        """validates mail format"""
+        match = re.fullmatch(r"[^@]+@[^@]+\.[^@]+", mail)
         if not match:
             raise InvalidMail
-        else:
-            return address
+
+        # pylint: disable = E1101
+        user = db.session.query(User).filter_by(mail=mail).first()
+        if user:
+            raise SignedMail
+        return mail
+
+    @staticmethod
+    def generate_hash(password):
+        """uses criptographic function to hide password on db"""
+        return sha256.hash(password)
+
+    @staticmethod
+    def verify_hash(password, hashed_password):
+        """ verifies password """
+        return sha256.verify(password, hashed_password)
+
+    @staticmethod
+    def delete_all():
+        """ delete entries in table """
+        deletion = User.__table__.delete()
+        db.session.execute(deletion)  # pylint: disable = E1101
+        db.session.commit()  # pylint: disable = E1101
