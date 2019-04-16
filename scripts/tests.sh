@@ -1,3 +1,3 @@
 #!/usr/bin/env sh
 echo "TESTS RUNNING..."
-pytest --cov=tests/ --color=yes 
+python -m pytest --cov=tests/ --color=yes 

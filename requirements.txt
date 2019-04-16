@@ -2,6 +2,8 @@ flask
 flask-sqlalchemy
 flask-migrate
 flask-script
+flask_restful
+flask_jwt_extended
 psycopg2-binary
 gunicorn
 pylint
@@ -10,3 +12,4 @@ pytest==4.3.1
 pytest-cov
 pylint-flask
 coveralls==1.7.0
+passlib
