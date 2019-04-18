@@ -3,6 +3,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
 from app.exceptions import InvalidMail, SignedMail
+from app import app
 
 
 class Index(Resource):
@@ -10,6 +11,7 @@ class Index(Resource):
     @classmethod
     def get(cls):
         """get mmethod"""
+        app.logger.info('I logged in successfully')
         return "Hello, World!"
 
 
