@@ -11,8 +11,7 @@ class Index(Resource):
     @classmethod
     def get(cls):
         """get mmethod"""
-        app.logger.info('I logged in successfully')
-        return "Hello, World!"
+        app.logger.info('home visited')
 
 
 class Android(Resource):

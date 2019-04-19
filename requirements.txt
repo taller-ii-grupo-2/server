@@ -13,3 +13,7 @@ pytest-cov
 pylint-flask
 coveralls==1.7.0
 passlib
+
+# chat
+flask-socketio
+eventlet

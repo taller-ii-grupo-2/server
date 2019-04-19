@@ -4,7 +4,7 @@ from app.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
 from flask_jwt_extended import JWTManager
-from flask_socketio import SocketIO
+from flask_socketio import SocketIO, send
 import logging
 import time
 
@@ -30,6 +30,24 @@ api.add_resource(routes.Android, '/android')
 api.add_resource(routes.AllUsers, '/users/all')
 api.add_resource(routes.AddUsers, '/users/add')
 
+app.logger.info('in main')
+
 @socketio.on('message')
-def handle_message(message):
-    print('received message: ' + message)
+def handleMessage(msg):
+    print('Message: ' + msg)
+    app.logger.info('broadcasting received msg: ' + msg)
+    send(msg, broadcast=True)
+
+@socketio.on('connect')
+def handle_message():
+    app.logger.info('new connnectionn')
+#    print('received message: ' + message)
+
+# @socketio.on('message')
+# def handle_message(msg):
+#     app.logger.info('broadcasting received msg: ' + msg)
+#     send(msg, broadcast = True)
+
+# @socketio.on_error()        # Handles the default namespace
+# def error_handler(e):
+#     app.logger.info('error occurred: ' + e)
