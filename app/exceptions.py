@@ -1,4 +1,6 @@
 """Module defining exceptions."""
+BAD_REQUEST = 400
+NOT_AUTHORIZED = 401
 
 
 class InvalidMail(Exception):
@@ -7,6 +9,7 @@ class InvalidMail(Exception):
     def __init__(self):
         super().__init__()
         self.message = 'Invalid mail. It should be like name@example.com'
+        self.code = BAD_REQUEST
 
 
 class SignedMail(Exception):
@@ -14,3 +17,12 @@ class SignedMail(Exception):
     def __init__(self):
         super().__init__()
         self.message = 'That mail is already registered'
+        self.code = BAD_REQUEST
+
+
+class InvalidToken(Exception):
+    """ Is raised when a token doesn't belong to any user"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'User does not have access'
+        self.code = NOT_AUTHORIZED

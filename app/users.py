@@ -2,8 +2,9 @@
 import re
 import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
+from firebase_admin import auth
 from app import db
-from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidMail, SignedMail, InvalidToken
 
 
 class User(db.Model):
@@ -45,6 +46,17 @@ class User(db.Model):
             db.session.commit()  # pylint: disable = E1101
         except (sql.DataError, InvalidMail, SignedMail) as error:
             raise error
+
+    @staticmethod
+    def login_user(token, expiration):
+        """ adds user to table """
+        try:
+            cookie = auth.create_session_cookie(token,
+                                                expires_in=expiration
+                                                )
+            return cookie
+        except auth.AuthError:
+            raise InvalidToken
 
     @validates('mail')
     # pylint: disable = unused-argument
