@@ -41,15 +41,15 @@ class AddUsers(Resource):
         content = request.get_json()
         name = content['name']
         mail = content['mail']
-        password = content['password']
         try:
-            token = User.add_user(name, mail, password)
-            response = jsonify(str(token))
+            User.add_user(name, mail)
+            response = jsonify("User added")
             response.status_code = 200
         except (InvalidMail, SignedMail) as error:
             response = jsonify(error.message)
             response.status_code = 400
         return response
+
 
 class DeleteUsers(Resource):
     """delete users endpoint"""

@@ -6,23 +6,22 @@ import pytest
 def test_addusers_incorrect_mail():
 	
 	with pytest.raises(InvalidMail):
-		token = User.add_user('agustin','agustin.payasliangmail.com','asdasd')
+		User.add_user('agustin','agustin.payasliangmail.com')
 	User.delete_all()
 	
 
 def test_addusers_correct_mail():
 
-	token = User.add_user('agustin','agustin.payaslian@gmail.com','asdasd')
+	User.add_user('agustin','agustin.payaslian@gmail.com')
 	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
 	assert 'agustin' in user.name
 	User.delete_all()
 
 
 def test_addusers_with_same_mail():
-	password = 'asdasd'
-	token = User.add_user('agustin','agustin.payaslian@gmail.com',password)
+	User.add_user('agustin','agustin.payaslian@gmail.com')
 	with pytest.raises(SignedMail):
-		token = User.add_user('agustin','agustin.payaslian@gmail.com',password)
+		User.add_user('agustin','agustin.payaslian@gmail.com')
 	User.delete_all()
 
 

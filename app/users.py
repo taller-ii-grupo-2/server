@@ -2,7 +2,6 @@
 import re
 import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
-from firebase_admin import auth
 from app import db
 from app.exceptions import InvalidMail, SignedMail
 
@@ -35,7 +34,7 @@ class User(db.Model):
 
     # pylint: disable = R0913
     @staticmethod
-    def add_user(name, mail, password):
+    def add_user(name, mail):
         """ adds user to table """
         try:
             user = User(
@@ -46,15 +45,6 @@ class User(db.Model):
             db.session.commit()  # pylint: disable = E1101
         except (sql.DataError, InvalidMail, SignedMail) as error:
             raise error
-
-        user_id = str(user.id)
-        auth.create_user(
-            uid=user_id,
-            email=mail,
-            password=password,
-            display_name=name
-            )
-        return auth.create_custom_token(user_id)
 
     @validates('mail')
     # pylint: disable = unused-argument
@@ -77,8 +67,6 @@ class User(db.Model):
         deletion = User.__table__.delete()
         db.session.execute(deletion)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
-        for user in auth.list_users().iterate_all():
-            auth.delete_user(user.uid)
 
     @staticmethod
     def get_user_by_mail(mail):
