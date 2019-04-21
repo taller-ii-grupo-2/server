@@ -2,7 +2,7 @@
 import re
 import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
-from passlib.hash import pbkdf2_sha256 as sha256
+from firebase_admin import auth
 from app import db
 from app.exceptions import InvalidMail, SignedMail
 
@@ -12,16 +12,14 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(), nullable=False)
     mail = db.Column(db.String(), unique=True, nullable=False)
-    password = db.Column(db.String(), nullable=False)
+    name = db.Column(db.String(), nullable=False, server_default=' ')
 
     # pylint: disable = R0913
-    def __init__(self, name, mail, password):
+    def __init__(self, name, mail):
         """ initializes table """
-        self.name = name
         self.mail = mail
-        self.password = password
+        self.name = name
 
     def __repr__(self):
         """ assigns id"""
@@ -31,9 +29,8 @@ class User(db.Model):
         """ table to json """
         return {
             'id': self.id,
-            'name': self.name,
             'mail': self.mail,
-            'password': self.password
+            'name': self.name
         }
 
     # pylint: disable = R0913
@@ -42,15 +39,22 @@ class User(db.Model):
         """ adds user to table """
         try:
             user = User(
-                name=name,
                 mail=mail,
-                password=User.generate_hash(password)
+                name=name
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
         except (sql.DataError, InvalidMail, SignedMail) as error:
             raise error
-        return user
+
+        user_id = str(user.id)
+        auth.create_user(
+            uid=user_id,
+            email=mail,
+            password=password,
+            display_name=name
+            )
+        return auth.create_custom_token(user_id)
 
     @validates('mail')
     # pylint: disable = unused-argument
@@ -68,18 +72,16 @@ class User(db.Model):
         return mail
 
     @staticmethod
-    def generate_hash(password):
-        """uses criptographic function to hide password on db"""
-        return sha256.hash(password)
-
-    @staticmethod
-    def verify_hash(password, hashed_password):
-        """ verifies password """
-        return sha256.verify(password, hashed_password)
-
-    @staticmethod
     def delete_all():
         """ delete entries in table """
         deletion = User.__table__.delete()
         db.session.execute(deletion)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
+        for user in auth.list_users().iterate_all():
+            auth.delete_user(user.uid)
+
+    @staticmethod
+    def get_user_by_mail(mail):
+        """ search user by mail in db """
+        # pylint: disable = E1101
+        return db.session.query(User).filter_by(mail=mail).first()
