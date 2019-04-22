@@ -1,10 +1,10 @@
 """Module defining users model needed to define the db table."""
 import re
-import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
 from firebase_admin import auth
 from app import db
-from app.exceptions import InvalidMail, SignedMail, InvalidToken
+from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidToken, UserNotRegistered
 
 
 class User(db.Model):
@@ -44,7 +44,7 @@ class User(db.Model):
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
-        except (sql.DataError, InvalidMail, SignedMail) as error:
+        except (InvalidMail, SignedMail) as error:
             raise error
 
     @staticmethod
@@ -71,6 +71,10 @@ class User(db.Model):
         user = db.session.query(User).filter_by(mail=mail).first()
         if user:
             raise SignedMail
+
+        user = auth.get_user_by_email(mail)
+        if not user:
+            raise UserNotRegistered
         return mail
 
     @staticmethod

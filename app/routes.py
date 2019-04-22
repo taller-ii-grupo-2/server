@@ -3,7 +3,8 @@ import datetime
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
-from app.exceptions import InvalidMail, SignedMail, InvalidToken
+from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidToken, UserNotRegistered
 
 
 class Index(Resource):
@@ -46,7 +47,7 @@ class Register(Resource):
             User.add_user(name, mail)
             response = jsonify("User added")
             response.status_code = 200
-        except (InvalidMail, SignedMail) as error:
+        except (InvalidMail, SignedMail, UserNotRegistered) as error:
             response = jsonify(error.message)
             response.status_code = error.code
         return response
@@ -63,7 +64,7 @@ class Login(Resource):
         try:
             cookie = User.login_user(token, expiration)
             expires = datetime.datetime.now() + expiration
-            response = jsonify("User added")
+            response = jsonify("User logged")
             response.set_cookie(
                 'session', cookie, expires=expires, httponly=True, secure=True)
             response.status_code = 200
