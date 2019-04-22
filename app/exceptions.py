@@ -26,3 +26,11 @@ class InvalidToken(Exception):
         super().__init__()
         self.message = 'User does not have access'
         self.code = NOT_AUTHORIZED
+
+
+class UserNotRegistered(Exception):
+    """ Is raised when a a user is not registered in firebase"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'User is not registered in firebase'
+        self.code = NOT_AUTHORIZED
