@@ -5,10 +5,8 @@ python:
 
 services:
   - docker
-  - postgresql
 
 before install:
-  - psql -c 'create database travis_ci_test;' -U postgres
   - docker-compose up
 
 script: 
