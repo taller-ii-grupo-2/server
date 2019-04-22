@@ -13,3 +13,4 @@ pytest-cov
 pylint-flask
 coveralls==1.7.0
 passlib
+firebase-admin
