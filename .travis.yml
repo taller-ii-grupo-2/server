@@ -5,7 +5,6 @@ python:
 
 services:
   - docker
-  - postgres
 
 before install:
   - docker-compose up
