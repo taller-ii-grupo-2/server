@@ -45,10 +45,10 @@ class Register(Resource):
         mail = content['mail']
         try:
             User.add_user(name, mail)
-            response = jsonify("User added")
+            response = jsonify({'message':'User added'})
             response.status_code = 200
         except (InvalidMail, SignedMail, UserNotRegistered) as error:
-            response = jsonify(error.message)
+            response = jsonify({'message':error.message})
             response.status_code = error.code
         return response
 
@@ -64,12 +64,12 @@ class Login(Resource):
         try:
             cookie = User.login_user(token, expiration)
             expires = datetime.datetime.now() + expiration
-            response = jsonify("User logged")
+            response = jsonify({'message':'User logged'})
             response.set_cookie(
                 'session', cookie, expires=expires, httponly=True, secure=True)
             response.status_code = 200
         except InvalidToken as error:
-            response = jsonify(error.message)
+            response = jsonify({'message':error.message})
             response.status_code = error.code
         return response
 

@@ -39,7 +39,7 @@ class User(db.Model):
         """ adds user to table """
         try:
             user = User(
-                mail=mail,
+                mail=mail.lower(),
                 name=name
             )
             db.session.add(user)  # pylint: disable = E1101
