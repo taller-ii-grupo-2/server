@@ -44,7 +44,7 @@ class User(db.Model):
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
-        except (InvalidMail, SignedMail) as error:
+        except (InvalidMail, SignedMail, UserNotRegistered) as error:
             raise error
 
     @staticmethod
