@@ -2,7 +2,6 @@
 import re
 import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
-from passlib.hash import pbkdf2_sha256 as sha256
 from app import db
 from app.exceptions import InvalidMail, SignedMail
 
@@ -44,7 +43,7 @@ class User(db.Model):
             user = User(
                 name=name,
                 mail=mail,
-                password=User.generate_hash(password)
+                password=password
             )
             db.session.add(user)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
@@ -66,16 +65,6 @@ class User(db.Model):
         if user:
             raise SignedMail
         return mail
-
-    @staticmethod
-    def generate_hash(password):
-        """uses criptographic function to hide password on db"""
-        return sha256.hash(password)
-
-    @staticmethod
-    def verify_hash(password, hashed_password):
-        """ verifies password """
-        return sha256.verify(password, hashed_password)
 
     @staticmethod
     def delete_all():
