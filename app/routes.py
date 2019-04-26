@@ -45,10 +45,10 @@ class Register(Resource):
         mail = content['mail']
         try:
             User.add_user(name, mail)
-            response = jsonify({'message':'User added'})
+            response = jsonify({'message': 'User added'})
             response.status_code = 200
         except (InvalidMail, SignedMail, UserNotRegistered) as error:
-            response = jsonify({'message':error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -64,12 +64,12 @@ class Login(Resource):
         try:
             cookie = User.login_user(token, expiration)
             expires = datetime.datetime.now() + expiration
-            response = jsonify({'message':'User logged'})
+            response = jsonify({'message': 'User logged'})
             response.set_cookie(
                 'session', cookie, expires=expires, httponly=True, secure=True)
             response.status_code = 200
         except InvalidToken as error:
-            response = jsonify({'message':error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -80,3 +80,13 @@ class DeleteUsers(Resource):
     def delete(cls):
         """delete method"""
         User.delete_all()
+
+
+class DeleteUser(Resource):
+    """delete users endpoint"""
+    @classmethod
+    def delete(cls):
+        """delete method"""
+        content = request.get_json()
+        mail = content['mail']
+        User.delete_user_with_mail(mail)

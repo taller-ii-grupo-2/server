@@ -72,9 +72,11 @@ class User(db.Model):
         if user:
             raise SignedMail
 
-        user = auth.get_user_by_email(mail)
-        if not user:
+        try:
+            user = auth.get_user_by_email(mail)
+        except:
             raise UserNotRegistered
+
         return mail
 
     @staticmethod
@@ -83,6 +85,14 @@ class User(db.Model):
         deletion = User.__table__.delete()
         db.session.execute(deletion)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
+
+    @staticmethod
+    def delete_user_with_mail(mail):
+        """ delete entries in table """
+        User.query.filter_by(mail=mail).delete()
+        db.session.commit()  # pylint: disable = E1101
+        user = auth.get_user_by_email(mail)
+        auth.delete_user(user.uid)
 
     @staticmethod
     def get_user_by_mail(mail):
