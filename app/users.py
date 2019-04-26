@@ -1,7 +1,7 @@
 """Module defining users model needed to define the db table."""
 import re
 from sqlalchemy.orm import validates
-from firebase_admin import auth
+from app.fb_user import FbUser
 from app import db
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
@@ -51,11 +51,9 @@ class User(db.Model):
     def login_user(token, expiration):
         """ adds user to table """
         try:
-            cookie = auth.create_session_cookie(token,
-                                                expires_in=expiration
-                                                )
+            cookie = FbUser.login_user(token, expiration)
             return cookie
-        except auth.AuthError:
+        except InvalidToken:
             raise InvalidToken
 
     @validates('mail')
@@ -73,7 +71,7 @@ class User(db.Model):
             raise SignedMail
 
         try:
-            user = auth.get_user_by_email(mail)
+            user = FbUser.get_user_by_email(mail)
         except:
             raise UserNotRegistered
 
@@ -91,8 +89,7 @@ class User(db.Model):
         """ delete entries in table """
         User.query.filter_by(mail=mail).delete()
         db.session.commit()  # pylint: disable = E1101
-        user = auth.get_user_by_email(mail)
-        auth.delete_user(user.uid)
+        FbUser.delete_user_with_email(mail)
 
     @staticmethod
     def get_user_by_mail(mail):
