@@ -31,7 +31,6 @@ from app import routes, users  # noqa: E402, F401
 api.add_resource(routes.Index, '/')
 api.add_resource(routes.Android, '/android')
 api.add_resource(routes.AllUsers, '/users/all')
-api.add_resource(routes.AddUsers, '/users/add')
 api.add_resource(routes.CreateOrganization, '/organizations/creation')
 api.add_resource(routes.Register, '/register')
 api.add_resource(routes.DeleteUsers, '/delete')

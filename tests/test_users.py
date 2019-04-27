@@ -2,12 +2,9 @@ from app.users import User
 from app.exceptions import InvalidMail, SignedMail, InvalidToken, UserNotRegistered
 from firebase_admin import auth
 import pytest
-<<<<<<< HEAD
 import os
 from app import db
-=======
 import datetime
->>>>>>> origin/staging
 
 
 def test_addusers_incorrect_mail():
@@ -22,16 +19,9 @@ def test_addusers_correct_mail():
     assert 'agustin' in user.name
 
 # def test_addusers_incorrect_mail():
-<<<<<<< HEAD
 #     with pytest.raises(InvalidMail):
 #         User.add_user('agustin','agustin.payasliangmail.com','asdasd')
 #     User.delete_all()
-=======
-	
-# 	with pytest.raises(InvalidMail):
-# 		User.add_user('agustin','agustin.payasliangmail.com')
-# 	User.delete_all()
->>>>>>> origin/staging
 	
 
 # def test_addusers_correct_mail():
