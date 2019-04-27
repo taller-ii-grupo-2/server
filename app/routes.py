@@ -11,7 +11,7 @@ class Index(Resource):
     @classmethod
     def get(cls):
         """get mmethod"""
-        app.logger.info('home visited')
+        app.logger.info('home visited')  # pylint: disable=no-member
 
 
 class Android(Resource):
