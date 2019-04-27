@@ -29,7 +29,7 @@ api.add_resource(routes.Index, '/')
 api.add_resource(routes.Android, '/android')
 api.add_resource(routes.AllUsers, '/users/all')
 api.add_resource(routes.AddUsers, '/users/add')
-api.add_resource(routes.CreateOrganization, '/organizations/creation')
+# api.add_resource(routes.CreateOrganization, '/organizations/creation')
 
 app.logger.info('in main')
 
