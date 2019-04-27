@@ -7,11 +7,14 @@ from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO, send
 import logging
 import time
+import firebase_admin
+from firebase_admin import credentials
 
+cred = credentials.Certificate('hypechatapp.json')
+default_app = firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 app.config.from_object(Config)
-jwt = JWTManager(app)
 db = SQLAlchemy(app)
 api = Api(app)
 socketio = SocketIO(app)
@@ -30,6 +33,12 @@ api.add_resource(routes.Android, '/android')
 api.add_resource(routes.AllUsers, '/users/all')
 api.add_resource(routes.AddUsers, '/users/add')
 api.add_resource(routes.CreateOrganization, '/organizations/creation')
+api.add_resource(routes.Register, '/register')
+api.add_resource(routes.DeleteUsers, '/delete')
+api.add_resource(routes.Login, '/login')
+api.add_resource(routes.Logout, '/logout')
+api.add_resource(routes.DeleteUser, '/deleteone')
+
 
 app.logger.info('in main')
 
@@ -54,3 +63,4 @@ def handle_message():
 # @socketio.on_error()        # Handles the default namespace
 # def error_handler(e):
 #     app.logger.info('error occurred: ' + e)
+

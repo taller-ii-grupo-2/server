@@ -1,10 +1,14 @@
 """File containing all endpoints in the app."""
+import flask
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
-from app.exceptions import InvalidMail, SignedMail, InvalidOrganizationName
+from app.exceptions import InvalidOrganizationName
 from app import app
+from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidToken, UserNotRegistered
+from app.exceptions import InvalidCookie
 
 
 class Index(Resource):
@@ -35,7 +39,7 @@ class AllUsers(Resource):
             return str(exception)
 
 
-class AddUsers(Resource):
+class Register(Resource):
     """add users endpoint"""
     @classmethod
     def post(cls):
@@ -43,18 +47,65 @@ class AddUsers(Resource):
         content = request.get_json()
         name = content['name']
         mail = content['mail']
-        password = content['password']
         try:
-            user = User.add_user(name, mail, password)
-            data = {'id': user.id,
-                    'message': 'User added.'
-                    }
-            response = jsonify(data)
+            User.add_user(name, mail)
+            response = jsonify({'message': 'User added'})
             response.status_code = 200
-        except (InvalidMail, SignedMail) as error:
-            response = jsonify(error.message)
-            response.status_code = 400
+        except (InvalidMail, SignedMail, UserNotRegistered) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
         return response
+
+
+class Login(Resource):
+    """login users endpoint"""
+    @classmethod
+    def post(cls):
+        """post method"""
+        content = request.get_json()
+        token = content['token']
+        try:
+            cookie, expires = User.login_user(token)
+            response = jsonify({'message': 'User logged'})
+            response.set_cookie(
+                'session', cookie, expires=expires, httponly=True, secure=True)
+            response.status_code = 200
+        except InvalidToken as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+class Logout(Resource):
+    """logout users endpoint"""
+    @classmethod
+    def post(cls):
+        """post method"""
+        session_cookie = request.cookies.get('session')
+        try:
+            User.logout_user(session_cookie)
+            response = flask.make_response(flask.redirect('/login'))
+            response.set_cookie('session', expires=0)
+            return response
+        except InvalidCookie:
+            return flask.redirect('/login')
+
+
+class DeleteUsers(Resource):
+    """delete users endpoint"""
+    @classmethod
+    def delete(cls):
+        """delete method"""
+        User.delete_all()
+
+
+class DeleteUser(Resource):
+    """delete users endpoint"""
+    @classmethod
+    def delete(cls):
+        """delete method"""
+        content = request.get_json()
+        mail = content['mail']
+        User.delete_user_with_mail(mail)
 
 
 class CreateOrganization(Resource):
@@ -77,3 +128,5 @@ class CreateOrganization(Resource):
             response = jsonify(error.message)
             response.status_code = 400
         return response
+
+

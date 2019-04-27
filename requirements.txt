@@ -12,7 +12,12 @@ pytest==4.3.1
 pytest-cov
 pylint-flask
 coveralls==1.7.0
+<<<<<<< HEAD
 
 # chat
 flask-socketio
 eventlet
+=======
+passlib
+firebase-admin
+>>>>>>> origin/staging
