@@ -14,3 +14,13 @@ class SignedMail(Exception):
     def __init__(self):
         super().__init__()
         self.message = 'That mail is already registered'
+
+
+class InvalidOrganizationName(Exception):
+    """
+    Is raised when you enter an orga name
+    longer than the permitted value
+    """
+    def __init__(self):
+        super().__init__()
+        self.message = "That organizations' name is too long."
