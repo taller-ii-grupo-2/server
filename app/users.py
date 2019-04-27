@@ -5,6 +5,7 @@ from app.fb_user import FbUser
 from app import db
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
+from app.exceptions import InvalidCookie
 
 
 class User(db.Model):
@@ -48,13 +49,21 @@ class User(db.Model):
             raise error
 
     @staticmethod
-    def login_user(token, expiration):
+    def login_user(token):
         """ adds user to table """
         try:
-            cookie = FbUser.login_user(token, expiration)
-            return cookie
+            cookie, expiration = FbUser.login_user(token)
+            return cookie, expiration
         except InvalidToken:
             raise InvalidToken
+
+    @staticmethod
+    def logout_user(cookie):
+        """ adds user to table """
+        try:
+            return FbUser.logout_user(cookie)
+        except InvalidCookie:
+            raise InvalidCookie
 
     @validates('mail')
     # pylint: disable = unused-argument
@@ -72,7 +81,7 @@ class User(db.Model):
 
         try:
             user = FbUser.get_user_by_email(mail)
-        except:
+        except UserNotRegistered:
             raise UserNotRegistered
 
         return mail

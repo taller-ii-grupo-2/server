@@ -28,6 +28,14 @@ class InvalidToken(Exception):
         self.code = NOT_AUTHORIZED
 
 
+class InvalidCookie(Exception):
+    """ Is raised when a token doesn't belong to any user"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'User does not have permission to perform action'
+        self.code = NOT_AUTHORIZED
+
+
 class UserNotRegistered(Exception):
     """ Is raised when a a user is not registered in firebase"""
     def __init__(self):

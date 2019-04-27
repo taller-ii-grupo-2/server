@@ -1,10 +1,11 @@
 """File containing all endpoints in the app."""
-import datetime
+import flask
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
+from app.exceptions import InvalidCookie
 
 
 class Index(Resource):
@@ -57,13 +58,11 @@ class Login(Resource):
     """login users endpoint"""
     @classmethod
     def post(cls):
-        """put method"""
+        """post method"""
         content = request.get_json()
         token = content['token']
-        expiration = datetime.timedelta(days=5)
         try:
-            cookie = User.login_user(token, expiration)
-            expires = datetime.datetime.now() + expiration
+            cookie, expires = User.login_user(token)
             response = jsonify({'message': 'User logged'})
             response.set_cookie(
                 'session', cookie, expires=expires, httponly=True, secure=True)
@@ -72,6 +71,21 @@ class Login(Resource):
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
+
+
+class Logout(Resource):
+    """logout users endpoint"""
+    @classmethod
+    def post(cls):
+        """post method"""
+        session_cookie = request.cookies.get('session')
+        try:
+            User.logout_user(session_cookie)
+            response = flask.make_response(flask.redirect('/login'))
+            response.set_cookie('session', expires=0)
+            return response
+        except InvalidCookie:
+            return flask.redirect('/login')
 
 
 class DeleteUsers(Resource):

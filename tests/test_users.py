@@ -41,8 +41,7 @@ import datetime
 # def test_incorrect_login_user():
 
 # 	with pytest.raises(InvalidToken):
-# 		expiration = datetime.timedelta(days=5)
-# 		User.login_user('asdads',expiration)
+# 		User.login_user('asdads')
 
 # def test_correct_login_user():
 
