@@ -12,7 +12,6 @@ pytest==4.3.1
 pytest-cov
 pylint-flask
 coveralls==1.7.0
-passlib
 
 # chat
 flask-socketio
