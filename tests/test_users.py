@@ -10,13 +10,13 @@ import datetime
 def test_addusers_incorrect_mail():
     print(os.environ['DATABASE_URL'])
     with pytest.raises(InvalidMail):
-        User.add_user('agustin','agustin.payasliangmail.com','asdasd')
+        User.add_user('agustin','agustin.payasliangmail.com')
    # User.delete_all()
 
-def test_addusers_correct_mail():
-    db.create_all()
-    user = User.add_user('agustin','agustin.payaslian@gmail.com','asdasd')
-    assert 'agustin' in user.name
+#def test_addusers_correct_mail():
+#    db.create_all()
+#    user = User.add_user('agustin','agustin.payaslian@gmail.com')
+#    assert 'agustin' in user.name
 
 # def test_addusers_incorrect_mail():
 #     with pytest.raises(InvalidMail):
