@@ -7,6 +7,7 @@ import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
 from app import db
 from app.exceptions import InvalidOrganizationName
+from app.exceptions import SignedOrganization
 from app import constant
 
 
@@ -70,11 +71,11 @@ class Organization(db.Model):
             raise InvalidOrganizationName
 
         # pylint: disable = E1101
-        # TODO ver si vale la pena este chequeo.
-#        orga = db.session.query(Organization).
-#                           filter_by(org_name=org_name).first()
-#        if orga:
-#            raise SignedOrga
+        orga = db.session.query(Organization). \
+            filter_by(org_name=org_name).first()
+
+        if orga:
+            raise SignedOrganization
         return org_name
 
     @staticmethod

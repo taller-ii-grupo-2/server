@@ -3,7 +3,6 @@ from flask import Flask
 from app.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
-from flask_jwt_extended import JWTManager
 from flask_socketio import SocketIO, send
 import logging
 import time
@@ -62,4 +61,3 @@ def handle_message():
 # @socketio.on_error()        # Handles the default namespace
 # def error_handler(e):
 #     app.logger.info('error occurred: ' + e)
-
