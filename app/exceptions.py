@@ -20,6 +20,17 @@ class SignedMail(Exception):
         self.code = BAD_REQUEST
 
 
+class InvalidOrganizationName(Exception):
+    """
+    Is raised when you enter an orga name
+    longer than the permitted value
+    """
+    def __init__(self):
+        super().__init__()
+        self.message = "That organizations' name is too long."
+        self.code = BAD_REQUEST
+
+
 class InvalidToken(Exception):
     """ Is raised when a token doesn't belong to any user"""
     def __init__(self):
@@ -42,3 +53,11 @@ class UserNotRegistered(Exception):
         super().__init__()
         self.message = 'User is not registered in firebase'
         self.code = NOT_AUTHORIZED
+
+
+class SignedOrganization(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'An organization with that name was already created'
+        self.code = BAD_REQUEST

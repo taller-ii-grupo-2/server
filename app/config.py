@@ -29,4 +29,5 @@ class DevelopmentConfig(Config):
 
 class TestingConfig(Config):
     """Testing class for config."""
+    SQLALCHEMY_DATABASE_URI = "sqlite://"
     TESTING = True
