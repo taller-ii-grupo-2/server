@@ -89,7 +89,7 @@ class User(db.Model):
         """ delete entries in table """
         User.query.filter_by(mail=mail).delete()
         db.session.commit()  # pylint: disable = E1101
-        FbUser.delete_user_with_email(mail)
+        # FbUser.delete_user_with_email(mail)
 
     @staticmethod
     def get_user_by_mail(mail):
