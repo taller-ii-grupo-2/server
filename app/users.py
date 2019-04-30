@@ -4,8 +4,6 @@ from sqlalchemy.orm import validates
 from app.fb_user import FbUser
 from app import db
 from app.exceptions import InvalidMail, SignedMail
-from app.exceptions import InvalidToken, UserNotRegistered
-from app.exceptions import InvalidCookie
 
 
 class User(db.Model):
@@ -38,32 +36,28 @@ class User(db.Model):
     @staticmethod
     def add_user(name, mail):
         """ adds user to table """
-        try:
-            user = User(
-                mail=mail.lower(),
-                name=name
-            )
-            db.session.add(user)  # pylint: disable = E1101
-            db.session.commit()  # pylint: disable = E1101
-        except (InvalidMail, SignedMail, UserNotRegistered) as error:
-            raise error
+        user = User(
+            mail=mail.lower(),
+            name=name
+        )
+        db.session.add(user)  # pylint: disable = E1101
+        db.session.commit()  # pylint: disable = E1101
 
     @staticmethod
     def login_user(token):
         """ adds user to table """
-        try:
-            cookie, expiration = FbUser.login_user(token)
-            return cookie, expiration
-        except InvalidToken:
-            raise InvalidToken
+        cookie, expiration = FbUser.login_user(token)
+        return cookie, expiration
 
     @staticmethod
-    def logout_user(cookie):
+    def get_user_claims(cookie):
         """ adds user to table """
-        try:
-            return FbUser.logout_user(cookie)
-        except InvalidCookie:
-            raise InvalidCookie
+        return FbUser.get_claims(cookie)
+
+    @staticmethod
+    def get_user_with_cookie(cookie):
+        """ verifies if cookie is valid and return user id """
+        return FbUser.get_user_with_cookie(cookie)
 
     @validates('mail')
     # pylint: disable = unused-argument
@@ -79,10 +73,7 @@ class User(db.Model):
         if user:
             raise SignedMail
 
-        try:
-            user = FbUser.get_user_by_email(mail)
-        except UserNotRegistered:
-            raise UserNotRegistered
+        FbUser.get_user_by_email(mail)
 
         return mail
 
@@ -98,7 +89,7 @@ class User(db.Model):
         """ delete entries in table """
         User.query.filter_by(mail=mail).delete()
         db.session.commit()  # pylint: disable = E1101
-        FbUser.delete_user_with_email(mail)
+        # FbUser.delete_user_with_email(mail)
 
     @staticmethod
     def get_user_by_mail(mail):

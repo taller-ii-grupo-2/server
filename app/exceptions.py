@@ -53,3 +53,11 @@ class UserNotRegistered(Exception):
         super().__init__()
         self.message = 'User is not registered in firebase'
         self.code = NOT_AUTHORIZED
+
+
+class SignedOrganization(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'An organization with that name was already created'
+        self.code = BAD_REQUEST

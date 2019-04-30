@@ -27,12 +27,18 @@ class FbUser():
             raise InvalidToken
 
     @staticmethod
-    def logout_user(cookie):
+    def get_claims(cookie):
         """logout user with coookie"""
         try:
             return auth.verify_session_cookie(cookie)
         except ValueError:
             raise InvalidCookie
+
+    @staticmethod
+    def get_user_with_cookie(cookie):
+        """logout user with coookie"""
+        claims = FbUser.get_claims(cookie)
+        return claims['sub']
 
     @staticmethod
     def delete_user_with_email(mail):
