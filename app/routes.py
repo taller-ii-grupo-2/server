@@ -126,9 +126,9 @@ class CreateOrganization(Resource):
         org_name = content['org_name']
         session_cookie = request.cookies.get('session')
         try:
-            creator_user_id = User.get_user_with_cookie(session_cookie)
-            orga = Organization.add_orga(org_name, creator_user_id)
-            data = {'id': orga.id,
+            user = User.get_user_with_cookie(session_cookie)
+            orga_name = user.create_organization(org_name)
+            data = {'name': orga_name,
                     'message': 'orga added'
                     }
             response = jsonify(data)
