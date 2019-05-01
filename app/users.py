@@ -5,7 +5,7 @@ from app.fb_user import FbUser
 from app.organizations import Organization
 from app import db
 from app.exceptions import InvalidMail, SignedMail
-from app.associations import orgs
+from app.associations import ORGS
 
 
 class User(db.Model):
@@ -15,7 +15,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False, server_default=' ')
-    organizations = db.relationship('Organization', secondary=orgs, backref=db.backref('users', lazy='subquery'))
+    organizations = db.relationship(
+        'Organization',
+        secondary=ORGS,
+        backref=db.backref('users', lazy='subquery')
+        )
 
     # pylint: disable = R0913
     def __init__(self, name, mail):
@@ -63,7 +67,6 @@ class User(db.Model):
         fb_user = FbUser.get_user_with_cookie(cookie)
         return User.get_user_by_mail(fb_user.email)
 
-
     @validates('mail')
     # pylint: disable = unused-argument
     # pylint: disable = no-self-use
@@ -106,6 +109,12 @@ class User(db.Model):
         """ create a organization """
         orga = Organization.add_orga(org_name, self.id)
         self.organizations.append(orga)
-        db.session.commit()
-        return orga.org_name
+        db.session.commit()  # pylint: disable = E1101
+        return orga.name
 
+    def get_organizations(self):
+        """ create a organization """
+        orgas = []
+        for orga in self.organizations:
+            orgas.append(orga.name)
+        return orgas

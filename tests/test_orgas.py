@@ -16,4 +16,4 @@ def test_addorgas_too_long_name():
 def test_addorgas_correctly():
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name,1)
-	assert org_name == orga.org_name
+	assert org_name == orga.name
