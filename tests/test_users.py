@@ -22,7 +22,6 @@ def test_addusers_correct_mail(mocker):
 	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 	
 
-
 def test_addusers_with_same_mail(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
@@ -48,5 +47,28 @@ def test_correct_login_user(mocker):
 	assert cookie == mock_cookie
 
 
+def test_user_add_organization(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
+	org_name = "Accenture"
+	orga_name = user.create_organization(org_name)
+	assert orga_name == org_name
+	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 
+
+def test_user_add_organization(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
+	user.create_organization('Accenture')
+	user.create_organization('Philips')
+	user.create_organization('Ford')
+	orgas = user.get_organizations()
+	assert 'Accenture' in orgas
+	assert 'Philips' in orgas
+	assert 'Ford' in orgas
+	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 

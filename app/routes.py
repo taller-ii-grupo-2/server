@@ -4,7 +4,6 @@ import flask
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
-from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
 from app.exceptions import SignedOrganization
 from app import app
@@ -126,9 +125,9 @@ class CreateOrganization(Resource):
         org_name = content['org_name']
         session_cookie = request.cookies.get('session')
         try:
-            creator_user_id = User.get_user_with_cookie(session_cookie)
-            orga = Organization.add_orga(org_name, creator_user_id)
-            data = {'id': orga.id,
+            user = User.get_user_with_cookie(session_cookie)
+            orga_name = user.create_organization(org_name)
+            data = {'name': orga_name,
                     'message': 'orga added'
                     }
             response = jsonify(data)
@@ -136,6 +135,22 @@ class CreateOrganization(Resource):
         except(InvalidOrganizationName, SignedOrganization) as error:
             response = jsonify(error.message)
             response.status_code = error.code
+        except InvalidCookie:
+            return flask.redirect('/login')
+        return response
+
+
+class ShowOrganization(Resource):
+    """create new orga"""
+    @classmethod
+    def post(cls):
+        """post method"""
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            orgas = user.get_organizations()
+            response = jsonify(orgas)
+            response.status_code = 200
         except InvalidCookie:
             return flask.redirect('/login')
         return response
