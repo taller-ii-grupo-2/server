@@ -143,7 +143,7 @@ class CreateOrganization(Resource):
 class ShowOrganization(Resource):
     """create new orga"""
     @classmethod
-    def post(cls):
+    def get(cls):
         """post method"""
         session_cookie = request.cookies.get('session')
         try:
