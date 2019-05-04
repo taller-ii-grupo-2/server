@@ -105,9 +105,9 @@ class User(db.Model):
         # pylint: disable = E1101
         return db.session.query(User).filter_by(mail=mail).first()
 
-    def create_organization(self, org_name):
+    def create_organization(self, org_name, photo_url):
         """ create a organization """
-        orga = Organization.add_orga(org_name, self.id)
+        orga = Organization.add_orga(org_name, photo_url, self.id)
         self.organizations.append(orga)
         db.session.commit()  # pylint: disable = E1101
         return orga.name
@@ -116,5 +116,5 @@ class User(db.Model):
         """ create a organization """
         orgas = []
         for orga in self.organizations:
-            orgas.append(orga.name)
+            orgas.append(orga.serialize())
         return orgas

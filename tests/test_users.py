@@ -30,7 +30,8 @@ def test_addusers_with_same_mail(mocker):
 		User.add_user('agustin','agustin.payaslian@gmail.com')
 	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 
-def test_addusers_not_signed_in_firebase():
+def test_addusers_not_signed_in_firebase(mocker):
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',side_effect= UserNotRegistered )
 	with pytest.raises(UserNotRegistered):
 		User.add_user('agustin','agustin.payaslian@gmail.com')
 
@@ -53,22 +54,19 @@ def test_user_add_organization(mocker):
 	User.add_user('agustin','agustin.payaslian@gmail.com')
 	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
 	org_name = "Accenture"
-	orga_name = user.create_organization(org_name)
+	orga_name = user.create_organization(org_name, 'asdad')
 	assert orga_name == org_name
 	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 
 
-def test_user_add_organization(mocker):
+def test_user_get_organization(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
 	User.add_user('agustin','agustin.payaslian@gmail.com')
 	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
-	user.create_organization('Accenture')
-	user.create_organization('Philips')
-	user.create_organization('Ford')
+	user.create_organization('Accentur','wwdasdasf')
 	orgas = user.get_organizations()
-	assert 'Accenture' in orgas
-	assert 'Philips' in orgas
-	assert 'Ford' in orgas
+	assert 'Accentur' in orgas[1].values()
+	assert 'wwdasdasf' in orgas[1].values()
 	User.delete_user_with_mail('agustin.payaslian@gmail.com')
 

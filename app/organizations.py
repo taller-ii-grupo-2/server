@@ -19,7 +19,7 @@ class Organization(db.Model):
     name = db.Column(
         db.String(constant.MAX_ORGANIZATION_NAME_LENGTH),
         nullable=False)
-
+    url = db.Column(db.String())
     # In general, you will want to work with UTC dates and times in a server
     # application. This ensures that you are using uniform timestamps
     # regardless of where the users are located.
@@ -30,9 +30,10 @@ class Organization(db.Model):
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 
     # pylint: disable = R0913
-    def __init__(self, name, creator_user_id):
+    def __init__(self, name, url, creator_user_id):
         """ initializes table """
         self.name = name
+        self.url = url
         self.creator_user_id = creator_user_id
 
     def __repr__(self):
@@ -44,17 +45,19 @@ class Organization(db.Model):
         return {
             'id': self.id,
             'name': self.name,
+            'url': self.url,
             'creation_timestamp': self.creation_timestamp,
             'creator_user_id': self.creator_user_id
         }
 
     # pylint: disable = R0913
     @staticmethod
-    def add_orga(name, creator_user_id):
+    def add_orga(name, url, creator_user_id):
         """ adds orga to table """
         try:
             orga = Organization(
                 name=name,
+                url=url,
                 creator_user_id=creator_user_id
             )
             db.session.add(orga)  # pylint: disable = E1101
@@ -66,7 +69,7 @@ class Organization(db.Model):
     @validates('name')
     # pylint: disable = unused-argument
     # pylint: disable = no-self-use
-    def validate_email(self, key, org_name):
+    def validate_name(self, key, org_name):
         """validates mail format"""
         if len(org_name) > constant.MAX_ORGANIZATION_NAME_LENGTH:
             raise InvalidOrganizationName

@@ -10,10 +10,10 @@ def test_addorgas_too_long_name():
 
     org_name = "Rs4hi5zVr9TVHilIPTOCPPRqOvBIuPOnl"
     with pytest.raises(InvalidOrganizationName):
-        Organization.add_orga(org_name,1)
+        Organization.add_orga(org_name,'asdad',1)
 
 
 def test_addorgas_correctly():
 	org_name = "Exxon mobile"
-	orga = Organization.add_orga(org_name,1)
+	orga = Organization.add_orga(org_name, 'www.asd.com',1)
 	assert org_name == orga.name
