@@ -10,14 +10,13 @@ def test_addorgas_too_long_name():
 	with pytest.raises(InvalidOrganizationName):
 		Organization.add_orga(org_name,'asdad',1)
 
-def get_organization_that_does_not_exist():
+def test_get_organization_that_does_not_exist():
 	with pytest.raises(InvalidOrganization):
-		Organization.get_organization_by_name('name')
+		Organization.get_organization_by_name('namdadasd')
 
-def get_organization_that_exists():
-	with pytest.raises(InvalidOrganization):
-		Organization.add_orga('name','asdad',1)
-		Organization.get_organization_by_name('name')
+def test_get_organization_that_exists():
+	Organization.add_orga('name','asdad',1)
+	Organization.get_organization_by_name('name')
 
 def test_addorgas_correctly():
 	org_name = "Exxon mobile"
