@@ -1,5 +1,6 @@
 from app.users import User
-from app.exceptions import InvalidMail, SignedMail, InvalidToken, UserNotRegistered
+from app.organizations import Organization
+from app.exceptions import InvalidMail, SignedMail, InvalidToken, UserNotRegistered, UserIsNotAdmin
 from firebase_admin import auth
 import pytest
 from pytest_mock import mocker
@@ -47,26 +48,34 @@ def test_correct_login_user(mocker):
 	cookie, _ = User.login_user('mock_token')
 	assert cookie == mock_cookie
 
-
-def test_user_add_organization(mocker):
-	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
-	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	User.add_user('agustin','agustin.payaslian@gmail.com')
-	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
-	org_name = "Accenture"
-	orga_name = user.create_organization(org_name, 'asdad')
-	assert orga_name == org_name
-	User.delete_user_with_mail('agustin.payaslian@gmail.com')
-
-
 def test_user_get_organization(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	User.add_user('agustin','agustin.payaslian@gmail.com')
-	user = User.get_user_by_mail('agustin.payaslian@gmail.com')
-	user.create_organization('Accentur','wwdasdasf')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user)
 	orgas = user.get_organizations()
-	assert 'Accentur' in orgas[1].values()
-	assert 'wwdasdasf' in orgas[1].values()
-	User.delete_user_with_mail('agustin.payaslian@gmail.com')
+	assert 'org_name' in orgas[0].values()
+	assert 'www.asd.com' in orgas[0].values()
+
+def test_user_add_admin_to_organization(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agupayaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user)
+	orga.add_user(user2)
+	user.make_admin_user(user2,orga)
+	assert len(orga.admins) == 2
+
+def test_user_add_admin_to_organization_without_being_admin(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agupayaslian@gmail.com')
+	user3 = User.add_user('agustin','payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user)
+	orga.add_user(user2)
+	orga.add_user(user3)
+	with pytest.raises(UserIsNotAdmin):
+		user2.make_admin_user(user3,orga)
 

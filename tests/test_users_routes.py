@@ -20,7 +20,6 @@ def test_correct_register(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 200
 		assert 'added' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 	
 
 def test_invalid_mail_register(mocker):
@@ -51,7 +50,6 @@ def test_alredy_regitered_mail_register(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 400
 		assert 'registered' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 
 
 def test_login(mocker):
@@ -72,7 +70,6 @@ def test_login(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 200
 		assert 'logged' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 
 
 # def test_add_organization(mocker):
