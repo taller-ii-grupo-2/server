@@ -1,11 +1,7 @@
 """File containing all endpoints in the app."""
-import json
-import flask
 from flask import request, jsonify
 from flask_restful import Resource
 from app.users import User  # pylint: disable = syntax-error
-from app.exceptions import InvalidOrganizationName
-from app.exceptions import SignedOrganization
 from app import app
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
@@ -85,17 +81,14 @@ class Logout(Resource):
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_claims(session_cookie)
-            response = flask.make_response(flask.redirect('/login'))
+            response = jsonify({'message': 'User Logged out'})
             response.set_cookie('session', expires=0)
-            response.data = json.dumps({'message': 'User Logged out'})
             response.status_code = 200
-            return response
         except InvalidCookie as error:
-            response = flask.make_response(flask.redirect('/login'))
-            response.set_cookie('session', expires=0)
-            response.data = json.dumps({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
-            return response
+
+        return response
 
 
 class DeleteUsers(Resource):
@@ -114,43 +107,3 @@ class DeleteUser(Resource):
         content = request.get_json()
         mail = content['mail']
         User.delete_user_with_mail(mail)
-
-
-class CreateOrganization(Resource):
-    """create new orga"""
-    @classmethod
-    def post(cls):
-        """post method"""
-        content = request.get_json()
-        org_name = content['org_name']
-        session_cookie = request.cookies.get('session')
-        try:
-            user = User.get_user_with_cookie(session_cookie)
-            orga_name = user.create_organization(org_name)
-            data = {'name': orga_name,
-                    'message': 'orga added'
-                    }
-            response = jsonify(data)
-            response.status_code = 200
-        except(InvalidOrganizationName, SignedOrganization) as error:
-            response = jsonify(error.message)
-            response.status_code = error.code
-        except InvalidCookie:
-            return flask.redirect('/login')
-        return response
-
-
-class ShowOrganization(Resource):
-    """create new orga"""
-    @classmethod
-    def post(cls):
-        """post method"""
-        session_cookie = request.cookies.get('session')
-        try:
-            user = User.get_user_with_cookie(session_cookie)
-            orgas = user.get_organizations()
-            response = jsonify(orgas)
-            response.status_code = 200
-        except InvalidCookie:
-            return flask.redirect('/login')
-        return response

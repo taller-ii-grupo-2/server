@@ -2,9 +2,9 @@
 import re
 from sqlalchemy.orm import validates
 from app.fb_user import FbUser
-from app.organizations import Organization
 from app import db
 from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidUser, UserIsNotAdmin
 from app.associations import ORGS
 
 
@@ -49,6 +49,7 @@ class User(db.Model):
         )
         db.session.add(user)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
+        return user
 
     @staticmethod
     def login_user(token):
@@ -103,18 +104,29 @@ class User(db.Model):
     def get_user_by_mail(mail):
         """ search user by mail in db """
         # pylint: disable = E1101
-        return db.session.query(User).filter_by(mail=mail).first()
+        user = db.session.query(User).filter_by(mail=mail).first()
+        if not user:
+            raise InvalidUser
+        return user
 
-    def create_organization(self, org_name):
-        """ create a organization """
-        orga = Organization.add_orga(org_name, self.id)
-        self.organizations.append(orga)
-        db.session.commit()  # pylint: disable = E1101
-        return orga.name
+    @staticmethod
+    def get_user_by_id(user_id):
+        """ search user by mail in db """
+        # pylint: disable = E1101
+        user = User.query.get(user_id)
+        if not user:
+            raise InvalidUser
+        return user
 
     def get_organizations(self):
         """ create a organization """
         orgas = []
         for orga in self.organizations:
-            orgas.append(orga.name)
+            orgas.append(orga.serialize())
         return orgas
+
+    def make_admin_user(self, user, orga):
+        """ create a organization """
+        if self not in orga.admins:
+            raise UserIsNotAdmin
+        orga.add_admin(user)
