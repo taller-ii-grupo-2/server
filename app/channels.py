@@ -102,3 +102,8 @@ class Channel(db.Model):
                 self.add_user(user)
             except UserIsAlredyInChannel:
                 continue
+
+    def get_users_in_channel(name, org_id):
+        """ get users in channel of orga """
+        return Channel.query.filter_by(name=name,
+                organization_id=org_id).first().users

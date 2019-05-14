@@ -6,7 +6,6 @@ import sqlalchemy.exc as sql
 from sqlalchemy.orm import validates
 from app import db
 from app.exceptions import SignedOrganization
-from app.exceptions import EventNameTooLong, InvalidEvent
 from app import constant
 from sqlalchemy.orm import relationship
 

@@ -11,6 +11,7 @@ from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
 from app.exceptions import InvalidCookie
 from app.messages import Message
+from flask_socketio import emit
 
 
 class Index(Resource):
@@ -147,12 +148,41 @@ def save(msg, user_id):
     dm_dest = content['dm_dest']
     author_id = user_id
     body = content['body']
-    msg = Message.add_message(organization, channel, dm_dest, author_id, body)
-    deliver_msg(msg)
+    Message.add_message(organization, channel, dm_dest, author_id, body)
 
-def deliver_msg(msg):
-    # TODO complete
-    pass
+    if organization:
+        deliver_msg(body, organization, channel, author_id)
+    else:
+        deliver_dm(body, dm_dest, author_id)
+
+def deliver_dm(msg_body, dm_dest, author_id):
+    """ if user is online, the msg gets delivered. """
+    author_name = User.get_user_by_id(author_id).name
+
+    d = {'msg_body':msg_body,
+            'author_name':author_name}
+
+    if User.is_online(dm_dest):
+        sid = User.get_user_by_id(dm_dest).sid
+        emit('dm', d, room=sid)
+
+def deliver_msg(msg_body, org_name, channel, author_id):
+    """ deliver msg to connected users. """
+
+    org_id = Organization.get_organization_by_name(org_name).id
+    author_name = User.get_user_by_id(author_id).name
+
+    d = {'msg_body':msg_body,
+            'organization':org_name,
+            'channel':channel,
+            'author_name':author_name}
+
+    users = Channel.get_users_in_channel(channel_name, org_id)
+
+    for user in users:
+        if User.is_online(user):
+            sid = User.get_user_by_id(user).sid
+            emit('message', d, room=sid)
 
 @socketio.on('message')
 def handleMessage(msg):
@@ -181,16 +211,3 @@ def disconnect_socket_user():
     user = User.get_user_by_sid(sid)
     user.udpate_sid(' ')
     app.logger.info('user with sid ' + sid + ' disconnected.')
- 
-
-#    app.logger.info()
-#    print('received message: ' + message)
-
-# @socketio.on('message')
-# def handle_message(msg):
-#     app.logger.info('broadcasting received msg: ' + msg)
-#     send(msg, broadcast = True)
-
-# @socketio.on_error()        # Handles the default namespace
-# def error_handler(e):
-#     app.logger.info('error occurred: ' + e)

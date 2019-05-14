@@ -122,6 +122,12 @@ class User(db.Model):
         # pylint: disable = E1101
         return db.session.query(User).filter_by(sid=sid).first()
 
+    @staticmethod
+    def is_online(id):
+        """ say if user is connected via socket """
+        # pylint: disable = E1101
+        return bool(db.session.query(User).filter_by(id=id).first().sid)
+
     def udpate_sid(self, sid):
         """ Update user's sid in table """
         # pylint: disable = E1101
