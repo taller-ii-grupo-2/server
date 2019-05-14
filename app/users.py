@@ -4,6 +4,8 @@ from sqlalchemy.orm import validates
 from app.fb_user import FbUser
 from app import db
 from app.exceptions import InvalidMail, SignedMail
+from app.exceptions import InvalidUser, UserIsNotAdmin
+from app.associations import ORGS
 
 
 class User(db.Model):
@@ -14,6 +16,11 @@ class User(db.Model):
     mail = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False, server_default=' ')
     sid = db.Column(db.String(20), nullable=True, server_default=' ')
+    organizations = db.relationship(
+        'Organization',
+        secondary=ORGS,
+        backref=db.backref('users', lazy='subquery')
+        )
 
     # pylint: disable = R0913
     def __init__(self, name, mail):
@@ -43,6 +50,7 @@ class User(db.Model):
         )
         db.session.add(user)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
+        return user
 
     @staticmethod
     def login_user(token):
@@ -58,7 +66,8 @@ class User(db.Model):
     @staticmethod
     def get_user_with_cookie(cookie):
         """ verifies if cookie is valid and return user id """
-        return FbUser.get_user_with_cookie(cookie)
+        fb_user = FbUser.get_user_with_cookie(cookie)
+        return User.get_user_by_mail(fb_user.email)
 
     @validates('mail')
     # pylint: disable = unused-argument
@@ -96,7 +105,10 @@ class User(db.Model):
     def get_user_by_mail(mail):
         """ search user by mail in db """
         # pylint: disable = E1101
-        return db.session.query(User).filter_by(mail=mail).first()
+        user = db.session.query(User).filter_by(mail=mail).first()
+        if not user:
+            raise InvalidUser
+        return user
 
     @staticmethod
     def get_user_by_id(id):
@@ -115,3 +127,25 @@ class User(db.Model):
         # pylint: disable = E1101
         self.sid = sid
         db.session.commit()
+
+    @staticmethod
+    def get_user_by_id(user_id):
+        """ search user by mail in db """
+        # pylint: disable = E1101
+        user = User.query.get(user_id)
+        if not user:
+            raise InvalidUser
+        return user
+
+    def get_organizations(self):
+        """ create a organization """
+        orgas = []
+        for orga in self.organizations:
+            orgas.append(orga.serialize())
+        return orgas
+
+    def make_admin_user(self, user, orga):
+        """ create a organization """
+        if self not in orga.admins:
+            raise UserIsNotAdmin
+        orga.add_admin(user)

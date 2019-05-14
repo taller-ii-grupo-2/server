@@ -3,6 +3,7 @@ import json
 import pytest
 from pytest_mock import mocker
 from firebase_admin import auth
+from app.users import User
 import datetime
 
 
@@ -19,7 +20,6 @@ def test_correct_register(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 200
 		assert 'added' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 	
 
 def test_invalid_mail_register(mocker):
@@ -50,7 +50,6 @@ def test_alredy_regitered_mail_register(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 400
 		assert 'registered' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 
 
 def test_login(mocker):
@@ -71,8 +70,28 @@ def test_login(mocker):
 		mensaje = response.get_json()
 		assert response.status_code == 200
 		assert 'logged' in mensaje['message']
-		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 
+
+# def test_add_organization(mocker):
+	
+# 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+
+# 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	
+	
+# 	with app.test_client() as client:
+# 		user = {
+# 			'name':'agustin',
+# 			'mail':'agustin.payaslian@gmail.com'
+# 		}
+# 		response = client.post('/register', data=json.dumps(user),  content_type='application/json')
+# 		user2 = User.get_user_by_mail('agustin.payaslian@gmail.com')
+# 		mocker.patch('app.users.User.get_user_with_cookie',return_value=user2)
+# 		response = client.post('/organization', data=json.dumps({'org_name':'JP Morgan'}),  content_type='application/json')
+# 		mensaje = response.get_json()
+# 		assert response.status_code == 200
+# 		assert 'Morgan' in mensaje['name']
+# 		client.delete('/deleteone', data=json.dumps(user),  content_type='application/json')
 
 # def test_logout(mocker):
 	

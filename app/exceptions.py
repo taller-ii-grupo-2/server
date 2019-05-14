@@ -31,6 +31,17 @@ class InvalidOrganizationName(Exception):
         self.code = BAD_REQUEST
 
 
+class InvalidChannelName(Exception):
+    """
+    Is raised when you enter an orga name
+    longer than the permitted value
+    """
+    def __init__(self):
+        super().__init__()
+        self.message = "That channel name is too long."
+        self.code = BAD_REQUEST
+
+
 class InvalidToken(Exception):
     """ Is raised when a token doesn't belong to any user"""
     def __init__(self):
@@ -60,4 +71,77 @@ class SignedOrganization(Exception):
     def __init__(self):
         super().__init__()
         self.message = 'An organization with that name was already created'
+        self.code = BAD_REQUEST
+
+
+class InvalidUser(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'There is no a user with that mail'
+        self.code = BAD_REQUEST
+
+
+class InvalidOrganization(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'There is no an organization with that name'
+        self.code = BAD_REQUEST
+
+
+class AlreadyCreatedChannel(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = \
+            'There already is a channel with that name in this organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsAlredyInChannel(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is alredy inside that channel'
+        self.code = BAD_REQUEST
+
+
+class UserIsAlredyInOrganization(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is alredy inside that organization'
+        self.code = BAD_REQUEST
+
+
+class UserNotInOrganization(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is not in this organization'
+        self.code = BAD_REQUEST
+
+
+class InvalidChannel(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That channel does not exist in this organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsAlreadyAdmin(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is already an admin of the organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsNotAdmin(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user not an admin of the organization'
         self.code = BAD_REQUEST
