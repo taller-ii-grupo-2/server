@@ -7,10 +7,11 @@ from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
 from app.exceptions import SignedOrganization
-from app import app
+from app import app, db, socketio
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
 from app.exceptions import InvalidCookie
+from app.messages import Message
 
 
 class Index(Resource):
@@ -131,6 +132,9 @@ class CreateOrganization(Resource):
             data = {'id': orga.id,
                     'message': 'orga added'
                     }
+
+            create_organization_specific_table(org_name)
+
             response = jsonify(data)
             response.status_code = 200
         except(InvalidOrganizationName, SignedOrganization) as error:
@@ -139,3 +143,59 @@ class CreateOrganization(Resource):
         except InvalidCookie:
             return flask.redirect('/login')
         return response
+
+def save(msg, user_id):
+    content = json.loads(msg)
+
+    organization = content['organization']
+    channel = content['channel']
+    dm_dest = content['dm_dest']
+    author_id = user_id
+    body = content['body']
+    msg = Message.add_message(organization, channel, dm_dest, author_id, body)
+    deliver_msg(msg)
+
+def deliver_msg(msg):
+    # TODO complete
+    pass
+
+@socketio.on('message')
+def handleMessage(msg):
+    user = User.get_user_by_sid(sid)
+    app.logger.info('Received msg: ' + msg)
+    save_msg(msg, user.id)
+    deliver_msg(msg)
+
+@socketio.on('connect')
+def handle_message():
+#    session_cookie = request.cookies.get('session')
+#    user_id = User.get_user_with_cookie(session_cookie)
+#    user = User.get_user_by_id(user_id)
+    app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
+
+@socketio.on('identification')
+def identyfy_connected_user(mail):
+    sid = request.sid
+    user = User.get_user_by_mail(mail)
+    user.udpate_sid(sid)
+    app.logger.info('identified user ' + mail + ' with sid ' + sid)
+
+@socketio.on('disconnect')
+def disconnect_socket_user():
+    sid = request.sid
+    user = User.get_user_by_sid(sid)
+    user.udpate_sid(' ')
+    app.logger.info('user with sid ' + sid + ' disconnected.')
+ 
+
+#    app.logger.info()
+#    print('received message: ' + message)
+
+# @socketio.on('message')
+# def handle_message(msg):
+#     app.logger.info('broadcasting received msg: ' + msg)
+#     send(msg, broadcast = True)
+
+# @socketio.on_error()        # Handles the default namespace
+# def error_handler(e):
+#     app.logger.info('error occurred: ' + e)

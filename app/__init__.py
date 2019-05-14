@@ -8,6 +8,7 @@ import logging
 import time
 import firebase_admin
 from firebase_admin import credentials
+from flask import request
 
 cred = credentials.Certificate('hypechatapp.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -41,23 +42,3 @@ api.add_resource(routes.DeleteUser, '/deleteone')
 app.logger.info('in main')
 
 
-@socketio.on('message')
-def handleMessage(msg):
-    print('Message: ' + msg)
-    app.logger.info('broadcasting received msg: ' + msg)
-    send(msg, broadcast=True)
-
-
-@socketio.on('connect')
-def handle_message():
-    app.logger.info('new connnectionn')
-#    print('received message: ' + message)
-
-# @socketio.on('message')
-# def handle_message(msg):
-#     app.logger.info('broadcasting received msg: ' + msg)
-#     send(msg, broadcast = True)
-
-# @socketio.on_error()        # Handles the default namespace
-# def error_handler(e):
-#     app.logger.info('error occurred: ' + e)

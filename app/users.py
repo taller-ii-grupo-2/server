@@ -13,6 +13,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False, server_default=' ')
+    sid = db.Column(db.String(20), nullable=True, server_default=' ')
 
     # pylint: disable = R0913
     def __init__(self, name, mail):
@@ -96,3 +97,21 @@ class User(db.Model):
         """ search user by mail in db """
         # pylint: disable = E1101
         return db.session.query(User).filter_by(mail=mail).first()
+
+    @staticmethod
+    def get_user_by_id(id):
+        """ search user by id in db """
+        # pylint: disable = E1101
+        return db.session.query(User).filter_by(id=id).first()
+
+    @staticmethod
+    def get_user_by_sid(sid):
+        """ search user by sid in db """
+        # pylint: disable = E1101
+        return db.session.query(User).filter_by(sid=sid).first()
+
+    def udpate_sid(self, sid):
+        """ Update user's sid in table """
+        # pylint: disable = E1101
+        self.sid = sid
+        db.session.commit()
