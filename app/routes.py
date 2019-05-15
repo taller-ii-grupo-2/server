@@ -148,25 +148,26 @@ def save(msg, user_id):
     dm_dest = content['dm_dest']
     author_id = user_id
     body = content['body']
-    Message.add_message(organization, channel, dm_dest, author_id, body)
+    msg = Message.add_message(organization, channel, dm_dest, author_id, body)
 
     if organization:
-        deliver_msg(body, organization, channel, author_id)
+        deliver_msg(body, organization, channel, author_id, msg.timestamp)
     else:
-        deliver_dm(body, dm_dest, author_id)
+        deliver_dm(body, dm_dest, author_id, msg.timestamp)
 
-def deliver_dm(msg_body, dm_dest, author_id):
+def deliver_dm(msg_body, dm_dest, author_id, timestamp):
     """ if user is online, the msg gets delivered. """
     author_name = User.get_user_by_id(author_id).name
 
     d = {'msg_body':msg_body,
-            'author_name':author_name}
+            'author_name':author_name,
+            'timestamp':timestamp}
 
     if User.is_online(dm_dest):
         sid = User.get_user_by_id(dm_dest).sid
         emit('dm', d, room=sid)
 
-def deliver_msg(msg_body, org_name, channel, author_id):
+def deliver_msg(msg_body, org_name, channel, author_id, timestamp):
     """ deliver msg to connected users. """
 
     org_id = Organization.get_organization_by_name(org_name).id
@@ -175,7 +176,8 @@ def deliver_msg(msg_body, org_name, channel, author_id):
     d = {'msg_body':msg_body,
             'organization':org_name,
             'channel':channel,
-            'author_name':author_name}
+            'author_name':author_name,
+            'timestamp':timestamp}
 
     users = Channel.get_users_in_channel(channel_name, org_id)
 
@@ -199,7 +201,8 @@ def handle_message():
     app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
 
 @socketio.on('identification')
-def identyfy_connected_user(mail):
+def identify_connected_user(mail):
+    app.logger.info('identifying... mail: ' + mail)
     sid = request.sid
     user = User.get_user_by_mail(mail)
     user.udpate_sid(sid)
