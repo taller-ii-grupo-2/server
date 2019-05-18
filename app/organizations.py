@@ -148,15 +148,17 @@ class Organization(db.Model):
             raise InvalidOrganization
         return orga
 
-    def add_user(self, user):
+    def add_user(self, adder_user, new_user):
         """ adds user to organization """
-        if user in self.users:
+        if new_user in self.users:
             raise UserIsAlredyInOrganization
-        self.users.append(user)
+        if adder_user not in admins:
+            raise UserIsNotAdmin
+        self.users.append(new_user)
         db.session.commit()  # pylint: disable = E1101
         for channel in self.channels:
             if not channel.private:
-                channel.add_user(user)
+                channel.add_user(new_user)
 
     def add_user_to_channel(self, user, channel_name):
         """ adds user to the channel """
