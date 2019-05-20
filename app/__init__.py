@@ -3,12 +3,11 @@ from flask import Flask
 from app.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
-from flask_socketio import SocketIO, send
+from flask_socketio import SocketIO
 import logging
 import time
 import firebase_admin
 from firebase_admin import credentials
-from flask import request
 
 cred = credentials.Certificate('hypechatapp.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -46,5 +45,3 @@ api.add_resource(routes.DeleteUser, '/deleteone')
 
 
 app.logger.info('in main')
-
-
