@@ -52,7 +52,8 @@ def test_user_get_organization(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
 	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	orga = Organization.create('org_name', 'www.asd.com',user)
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
 	orgas = user.get_organizations()
 	assert 'org_name' in orgas[0].values()
 	assert 'www.asd.com' in orgas[0].values()
@@ -62,7 +63,8 @@ def test_user_add_admin_to_organization(mocker):
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
 	user = User.add_user('agustin','agustin.payaslian@gmail.com')
 	user2 = User.add_user('agustin','agupayaslian@gmail.com')
-	orga = Organization.create('org_name', 'www.asd.com',user)
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
 	orga.add_user(user2)
 	user.make_admin_user(user2,orga)
 	assert len(orga.admins) == 2
@@ -73,7 +75,8 @@ def test_user_add_admin_to_organization_without_being_admin(mocker):
 	user = User.add_user('agustin','agustin.payaslian@gmail.com')
 	user2 = User.add_user('agustin','agupayaslian@gmail.com')
 	user3 = User.add_user('agustin','payaslian@gmail.com')
-	orga = Organization.create('org_name', 'www.asd.com',user)
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
 	orga.add_user(user2)
 	orga.add_user(user3)
 	with pytest.raises(UserIsNotAdmin):

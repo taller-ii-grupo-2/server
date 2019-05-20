@@ -111,22 +111,16 @@ class User(db.Model):
         return user
 
     @staticmethod
-    def get_user_by_id(id):
-        """ search user by id in db """
-        # pylint: disable = E1101
-        return db.session.query(User).filter_by(id=id).first()
-
-    @staticmethod
     def get_user_by_sid(sid):
         """ search user by sid in db """
         # pylint: disable = E1101
         return db.session.query(User).filter_by(sid=sid).first()
 
     @staticmethod
-    def is_online(id):
+    def is_online(user_id):
         """ say if user is connected via socket """
         # pylint: disable = E1101
-        return bool(db.session.query(User).filter_by(id=id).first().sid)
+        return bool(db.session.query(User).filter_by(id=user_id).first().sid)
 
     def udpate_sid(self, sid):
         """ Update user's sid in table """

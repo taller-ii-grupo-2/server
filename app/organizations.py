@@ -38,14 +38,20 @@ class Organization(db.Model):
         secondary=ADMINS,
         backref=db.backref('org_admin', lazy='subquery')
         )
+    description = db.Column(
+        db.String(constant.MAX_ORGANIZATION_DESCRIPTION_LENGTH),
+        nullable=False)
 
     # pylint: disable = R0913
     # pylint: disable = R0801
-    def __init__(self, name, url, creator_user_id):
+    def __init__(self, name, url, creator_user_id, description,
+                 welcome_message):
         """ initializes table """
         self.name = name
         self.url = url
         self.creator_user_id = creator_user_id
+        self.description = description
+        self.welcome_message = welcome_message
 
     # pylint: disable = R0801
     def __repr__(self):
@@ -64,13 +70,15 @@ class Organization(db.Model):
 
     # pylint: disable = R0913
     @staticmethod
-    def add_orga(name, url, user_id):
+    def add_orga(name, url, user_id, description, welcome_message):
         """ adds orga to table """
         try:
             orga = Organization(
                 name=name,
                 url=url,
-                creator_user_id=user_id
+                creator_user_id=user_id,
+                description=description,
+                welcome_message=welcome_message,
             )
             db.session.add(orga)  # pylint: disable = E1101
             db.session.commit()  # pylint: disable = E1101
@@ -79,9 +87,10 @@ class Organization(db.Model):
         return orga
 
     @staticmethod
-    def create(name, url, user):
+    def create(name, url, user, description, welcome_message):
         """ creates orga with 2 channels and admin """
-        orga = Organization.add_orga(name, url, user.id)
+        orga = Organization.add_orga(name, url, user.id, description,
+                                     welcome_message)
         orga.add_user_admin(user)
         orga.create_channel('General', False, user,
                             'General channel', 'Welcome')
@@ -148,12 +157,10 @@ class Organization(db.Model):
             raise InvalidOrganization
         return orga
 
-    def add_user(self, adder_user, new_user):
+    def add_user(self, new_user):
         """ adds user to organization """
         if new_user in self.users:
             raise UserIsAlredyInOrganization
-        if adder_user not in admins:
-            raise UserIsNotAdmin
         self.users.append(new_user)
         db.session.commit()  # pylint: disable = E1101
         for channel in self.channels:
