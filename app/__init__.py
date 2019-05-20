@@ -28,9 +28,13 @@ logging.basicConfig(
 
 from app import routes, users  # noqa: E402, F401
 
+# endpoints de prueba
 api.add_resource(routes.Index, '/')
 api.add_resource(routes.Android, '/android')
 api.add_resource(routes.AllUsers, '/users/all')
+# hasta aqui endpoints de prueba
+
+api.add_resource(routes.OrganizationMembers, '/organizations/members')
 # api.add_resource(routes.CreateOrganization, '/organization')
 # api.add_resource(routes.ShowOrganization, '/myorganizations')
 api.add_resource(routes.Register, '/register')

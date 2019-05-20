@@ -129,8 +129,6 @@ class CreateOrganization(Resource):
                     'message': 'orga added'
                     }
 
-            create_organization_specific_table(org_name)
-
             response = jsonify(data)
             response.status_code = 200
         except(InvalidOrganizationName, SignedOrganization) as error:
@@ -140,7 +138,36 @@ class CreateOrganization(Resource):
             return flask.redirect('/login')
         return response
 
-def save(msg, user_id):
+class OrganizationMembers(Resource):
+    """ organization's members """
+    def put(cls):
+        """add new member"""
+        content = request.get_json()
+        org_name = content['org_name']
+        mail_of_user_to_add = content['mail']
+        session_cookie = request.cookies.get('session')
+        try:
+            adder_user = User.get_user_with_cookie(session_cookie)
+            user_to_add = User.get_user_by_mail(mail_of_user_to_add)
+            orga = Organization.get_organization_by_name(org_name)
+            orga.add_user(adder_user, user_to_add)
+
+            data = {'message': 'user added'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except(UserIsAlredyInOrganization) as error:
+            response = jsonify(error.message)
+            response.status_code = error.code
+        except UserIsNotAdmin as error:
+            response = jsonify(error.message)
+            response.status_code = error.code
+        except InvalidCookie:
+            return flask.redirect('/login')
+        return response
+
+
+def save_msg(msg, user_id):
     content = json.loads(msg)
 
     organization = content['organization']
@@ -155,6 +182,7 @@ def save(msg, user_id):
     else:
         deliver_dm(body, dm_dest, author_id, msg.timestamp)
 
+
 def deliver_dm(msg_body, dm_dest, author_id, timestamp):
     """ if user is online, the msg gets delivered. """
     author_name = User.get_user_by_id(author_id).name
@@ -166,6 +194,7 @@ def deliver_dm(msg_body, dm_dest, author_id, timestamp):
     if User.is_online(dm_dest):
         sid = User.get_user_by_id(dm_dest).sid
         emit('dm', d, room=sid)
+
 
 def deliver_msg(msg_body, org_name, channel, author_id, timestamp):
     """ deliver msg to connected users. """
@@ -186,6 +215,7 @@ def deliver_msg(msg_body, org_name, channel, author_id, timestamp):
             sid = User.get_user_by_id(user).sid
             emit('message', d, room=sid)
 
+
 @socketio.on('message')
 def handleMessage(msg):
     user = User.get_user_by_sid(sid)
@@ -193,12 +223,14 @@ def handleMessage(msg):
     save_msg(msg, user.id)
     deliver_msg(msg)
 
+
 @socketio.on('connect')
 def handle_message():
-#    session_cookie = request.cookies.get('session')
-#    user_id = User.get_user_with_cookie(session_cookie)
-#    user = User.get_user_by_id(user_id)
+    # session_cookie = request.cookies.get('session')
+    # user_id = User.get_user_with_cookie(session_cookie)
+    # user = User.get_user_by_id(user_id)
     app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
+
 
 @socketio.on('identification')
 def identify_connected_user(mail):
@@ -207,6 +239,7 @@ def identify_connected_user(mail):
     user = User.get_user_by_mail(mail)
     user.udpate_sid(sid)
     app.logger.info('identified user ' + mail + ' with sid ' + sid)
+
 
 @socketio.on('disconnect')
 def disconnect_socket_user():
