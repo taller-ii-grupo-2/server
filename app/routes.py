@@ -166,6 +166,28 @@ class OrganizationMembers(Resource):
             return flask.redirect('/login')
         return response
 
+class Organizations(Resource):
+    """ manage orga """
+    def get(cls):
+        """ get users orgas """
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            orgas = user.get_organizations()
+
+            list_of_orgas = []
+            for orga in orgas:
+                current_orga_dict = {}
+                current_orga_dict['name'] = orga.name
+                current_orga_dict['urlImage'] = orga.url
+                list_of_orgas.append(current_orga_dict)
+
+            response = jsonify(list_of_orgas)
+            response.status_code = 200
+        except InvalidCookie:
+            return flask.redirect('/login')
+        return response
+
 
 def save_msg(msg, user_id):
     content = json.loads(msg)

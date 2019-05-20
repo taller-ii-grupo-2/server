@@ -144,7 +144,7 @@ class User(db.Model):
         return user
 
     def get_organizations(self):
-        """ create a organization """
+        """ return users organizations """
         orgas = []
         for orga in self.organizations:
             orgas.append(orga.serialize())
