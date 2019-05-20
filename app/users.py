@@ -15,6 +15,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False, server_default=' ')
+    sid = db.Column(db.String(20), nullable=True, server_default=' ')
     organizations = db.relationship(
         'Organization',
         secondary=ORGS,
@@ -110,6 +111,24 @@ class User(db.Model):
         return user
 
     @staticmethod
+    def get_user_by_sid(sid):
+        """ search user by sid in db """
+        # pylint: disable = E1101
+        return db.session.query(User).filter_by(sid=sid).first()
+
+    @staticmethod
+    def is_online(user_id):
+        """ say if user is connected via socket """
+        # pylint: disable = E1101
+        return bool(db.session.query(User).filter_by(id=user_id).first().sid)
+
+    def udpate_sid(self, sid):
+        """ Update user's sid in table """
+        # pylint: disable = E1101
+        self.sid = sid
+        db.session.commit()
+
+    @staticmethod
     def get_user_by_id(user_id):
         """ search user by mail in db """
         # pylint: disable = E1101
@@ -119,7 +138,7 @@ class User(db.Model):
         return user
 
     def get_organizations(self):
-        """ create a organization """
+        """ return users organizations """
         orgas = []
         for orga in self.organizations:
             orgas.append(orga.serialize())
