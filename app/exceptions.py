@@ -145,3 +145,11 @@ class UserIsNotAdmin(Exception):
         super().__init__()
         self.message = 'That user not an admin of the organization'
         self.code = BAD_REQUEST
+
+
+class UserIsNotCreator(Exception):
+    """ Is raised when you enter a email that was already in the db"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user not the creator of the organization'
+        self.code = BAD_REQUEST

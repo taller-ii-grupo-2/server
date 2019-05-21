@@ -60,12 +60,18 @@ class Organization(db.Model):
 
     def serialize(self):
         """ table to json """
+        channels = []
+        users = []
+        for channel in self.channels:
+            channels.append(channel.name)
+        for user in self.users:
+            users.append(user.name)
         return {
             'id': self.id,
             'name': self.name,
             'url': self.url,
-            'creation_timestamp': self.creation_timestamp,
-            'creator_user_id': self.creator_user_id
+            'users': users,
+            'channels': channels
         }
 
     # pylint: disable = R0913
@@ -185,3 +191,27 @@ class Organization(db.Model):
         """ adds user with admin acces """
         self.add_user(user)
         self.add_admin(user)
+
+    def get_name_and_url(self):
+        """ gets name and url of organization"""
+        return {
+            'name': self.name,
+            'url': self.url
+        }
+
+    def get_users_location(self):
+        """ gets location of users in organization """
+        users_location = []
+        for user in self.users:
+            users_location.append(user.get_name_and_location())
+        return users_location
+
+    def get_name_and_channels(self):
+        """ gets name and channels of organization """
+        channels = []
+        for channel in self.channels:
+            channels.append(channel.name)
+        return {
+            'name': self.name,
+            'channels': channels
+        }

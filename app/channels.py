@@ -43,6 +43,7 @@ class Channel(db.Model):
     # pylint: disable = R0801
     def serialize(self):
         """ table to json """
+
         return {
             'id': self.id,
             'name': self.name,

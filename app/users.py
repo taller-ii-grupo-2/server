@@ -4,10 +4,12 @@ from sqlalchemy.orm import validates
 from app.fb_user import FbUser
 from app import db
 from app.exceptions import InvalidMail, SignedMail
-from app.exceptions import InvalidUser, UserIsNotAdmin
+from app.exceptions import InvalidUser
+from app.exceptions import UserIsNotCreator
 from app.associations import ORGS
 
 
+# pylint: disable = R0902
 class User(db.Model):
     """ name table structure """
     __tablename__ = 'users'
@@ -15,6 +17,11 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     mail = db.Column(db.String(), unique=True, nullable=False)
     name = db.Column(db.String(), nullable=False, server_default=' ')
+    surname = db.Column(db.String(), nullable=False, server_default=' ')
+    user_name = db.Column(db.String(), nullable=False, server_default=' ')
+    longitude = db.Column(db.Float(), nullable=False)
+    latitude = db.Column(db.Float(), nullable=False)
+    url = db.Column(db.String(), nullable=False, server_default=' ')
     sid = db.Column(db.String(20), nullable=True, server_default=' ')
     organizations = db.relationship(
         'Organization',
@@ -23,10 +30,16 @@ class User(db.Model):
         )
 
     # pylint: disable = R0913
-    def __init__(self, name, mail):
+    def __init__(self, user_name, name, surname, mail,
+                 longitude, latitude, url):
         """ initializes table """
         self.mail = mail
+        self.user_name = user_name
+        self.surname = surname
         self.name = name
+        self.longitude = longitude
+        self.latitude = latitude
+        self.url = url
 
     def __repr__(self):
         """ assigns id"""
@@ -34,19 +47,30 @@ class User(db.Model):
 
     def serialize(self):
         """ table to json """
+        organizations = []
+        for orga in self.organizations:
+            organizations.append(orga.getname_and_channels)
+
         return {
-            'id': self.id,
-            'mail': self.mail,
-            'name': self.name
+            'name': self.name,
+            'username': self.user_name,
+            'surname': self.surname,
+            'url': self.url,
+            'organizations': organizations
         }
 
     # pylint: disable = R0913
     @staticmethod
-    def add_user(name, mail):
+    def add_user(user_name, name, surname, mail, longitude, latitude, url):
         """ adds user to table """
         user = User(
             mail=mail.lower(),
-            name=name
+            user_name=user_name,
+            surname=surname,
+            name=name,
+            longitude=longitude,
+            latitude=latitude,
+            url=url
         )
         db.session.add(user)  # pylint: disable = E1101
         db.session.commit()  # pylint: disable = E1101
@@ -146,6 +170,23 @@ class User(db.Model):
 
     def make_admin_user(self, user, orga):
         """ create a organization """
-        if self not in orga.admins:
-            raise UserIsNotAdmin
+        if self.id != orga.creator_user_id:
+            raise UserIsNotCreator
         orga.add_admin(user)
+
+    def get_name_and_location(self):
+        """get name and location of user"""
+        return {
+            'username': self.user_name,
+            'latitude': self.latitude,
+            'longitude': self.longitude
+        }
+
+    def change(self, username, name, surname, url):
+        """ changes user information """
+        self.user_name = username
+        self.surname = surname
+        self.name = name
+        self.url = url
+        db.session.commit()  # pylint: disable = E1101
+        FbUser.change_user(self.mail, username, url)

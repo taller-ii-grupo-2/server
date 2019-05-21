@@ -20,8 +20,8 @@ def test_addchannel_correctly():
 def test_adduser_to_channel_correctly(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
 	channel.add_user(user)
 	channel.add_user(user2)
@@ -30,7 +30,7 @@ def test_adduser_to_channel_correctly(mocker):
 def test_adduser_two_times_will_raise_exception(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
 	channel.add_user(user)
 	with pytest.raises(UserIsAlredyInChannel):
@@ -43,9 +43,9 @@ def test_get_not_existing_channel():
 def test_add_users(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','aguspayaslian@gmail.com')
-	user3 = User.add_user('agustin','payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	users = [user,user2,user3]
 	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
 	channel.add_users(users)
@@ -54,9 +54,9 @@ def test_add_users(mocker):
 def test_add_users_already_in_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','aguspayaslian@gmail.com')
-	user3 = User.add_user('agustin','payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	users = [user,user2,user3,user]
 	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
 	channel.add_users(users)

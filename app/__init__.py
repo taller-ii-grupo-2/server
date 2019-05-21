@@ -34,10 +34,15 @@ api.add_resource(routes.AllUsers, '/users/all')
 # hasta aqui endpoints de prueba
 
 api.add_resource(routes.OrganizationMembers, '/organizations/members')
-api.add_resource(routes.Organizations, '/organizations/')
+api.add_resource(routes.OrganizationMembersLocations,
+                 '/organizations/members/locations')
+api.add_resource(routes.Organizations, '/organizations')
+api.add_resource(routes.UserOrganizations, '/user/organizations')
+api.add_resource(routes.UserOrganizationsChannels,
+                 '/user/organizations/channels')
 # api.add_resource(routes.CreateOrganization, '/organization')
 # api.add_resource(routes.ShowOrganization, '/myorganizations')
-api.add_resource(routes.Register, '/register')
+api.add_resource(routes.Users, '/users')
 api.add_resource(routes.DeleteUsers, '/delete')
 api.add_resource(routes.Login, '/login')
 api.add_resource(routes.Logout, '/logout')

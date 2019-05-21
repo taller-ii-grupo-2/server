@@ -16,6 +16,18 @@ class FbUser():
             raise UserNotRegistered
 
     @staticmethod
+    def change_user(mail, username, url):
+        """obtain user with mail"""
+        try:
+            user = auth.get_user_by_email(mail)
+            auth.update_user(
+                user.uid,
+                display_name=username,
+                photo_url=url)
+        except auth.AuthError:
+            raise UserNotRegistered
+
+    @staticmethod
     def login_user(token):
         """login user with token"""
         expiration = datetime.timedelta(days=5)

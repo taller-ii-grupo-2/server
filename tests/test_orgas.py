@@ -36,7 +36,7 @@ def test_add_signedOrga(mocker):
 def test_orgas_add_users(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com'}
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',user.id, 
                                      'description', 'welcome_message')
@@ -46,7 +46,7 @@ def test_orgas_add_users(mocker):
 def test_orgas_create(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com'}
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user, 
                                    'description', 'welcome_message')
@@ -57,7 +57,7 @@ def test_orgas_create(mocker):
 def test_orgas_add_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com'}
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',user.id,
                                      'desc','welcome_message')
@@ -68,7 +68,7 @@ def test_orgas_add_channel(mocker):
 def test_add_the_same_user_twice(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com'}
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',user.id,
                                      'desc','welcome_message')
@@ -79,7 +79,7 @@ def test_add_the_same_user_twice(mocker):
 def test_orgas_add_two_channels_with_same_name(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -90,7 +90,7 @@ def test_orgas_add_two_channels_with_same_name(mocker):
 def test_create_orga_and_add_channels(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com'}
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -100,8 +100,8 @@ def test_create_orga_and_add_channels(mocker):
 def test_add_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -111,8 +111,8 @@ def test_add_user(mocker):
 def test_create_channel_with_user_that_doesnt_belong_to_organization(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -122,7 +122,7 @@ def test_create_channel_with_user_that_doesnt_belong_to_organization(mocker):
 def test_get_channels_with_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -131,8 +131,8 @@ def test_get_channels_with_user(mocker):
 def test_get_user_in_private_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -143,8 +143,8 @@ def test_get_user_in_private_channel(mocker):
 def test_get_users_per_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -157,8 +157,8 @@ def test_get_users_per_channel(mocker):
 def test_create_channel_then_add_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -170,8 +170,8 @@ def test_create_channel_then_add_user(mocker):
 def test_create_private_channel_then_add_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -183,8 +183,8 @@ def test_create_private_channel_then_add_user(mocker):
 def test_add_users_per_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
-	user2 = User.add_user('agustin','payas17@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -197,7 +197,7 @@ def test_add_users_per_channel(mocker):
 def test_add_admin_that_is_not_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',1,
                                      'desc','welcome_message')
@@ -207,7 +207,7 @@ def test_add_admin_that_is_not_user(mocker):
 def test_add_admin(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',1,
                                      'desc','welcome_message')
@@ -218,7 +218,7 @@ def test_add_admin(mocker):
 def test_add_admin_and_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.add_orga(org_name, 'www.asd.com',1,
                                      'desc','welcome_message')
@@ -228,7 +228,7 @@ def test_add_admin_and_user(mocker):
 def test_create_orga_with_admin_user(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
@@ -237,7 +237,7 @@ def test_create_orga_with_admin_user(mocker):
 def test_add_admin_to_admin(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
 	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
-	user = User.add_user('agustin','agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')

@@ -1,6 +1,6 @@
 """File containing all endpoints in the app."""
 import json
-from flask import request, jsonify, redirect
+from flask import request, jsonify
 from flask_restful import Resource
 from flask_socketio import emit
 from app.users import User  # pylint: disable = syntax-error
@@ -10,8 +10,9 @@ from app.exceptions import SignedOrganization
 from app import app, socketio
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
-from app.exceptions import InvalidCookie
-from app.exceptions import UserIsAlredyInOrganization, UserIsNotAdmin
+from app.exceptions import InvalidCookie, UserIsNotCreator
+from app.exceptions import UserIsAlredyInOrganization
+from app.exceptions import InvalidOrganization
 from app.messages import Message
 from app.channels import Channel
 
@@ -39,24 +40,62 @@ class AllUsers(Resource):
         """get mmethod"""
         try:
             users = User.query.all()
-            return jsonify([e.serialize() for e in users])
+            return jsonify([e.name for e in users])
         except Exception as exception:  # pylint: disable = broad-except
             return str(exception)
 
 
-class Register(Resource):
+class Users(Resource):
     """add users endpoint"""
     @classmethod
     def post(cls):
         """post method"""
         content = request.get_json()
+        user_name = content['username']
         name = content['name']
+        surname = content['surname']
         mail = content['mail']
+        latitude = content['latitude']
+        longitude = content['longitude']
+        url = content['urlImageProfile']
         try:
-            User.add_user(name, mail)
+            User.add_user(user_name, name, surname, mail, latitude,
+                          longitude, url)
             response = jsonify({'message': 'User added'})
             response.status_code = 200
         except (InvalidMail, SignedMail, UserNotRegistered) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    def put(cls):
+        """post method"""
+        content = request.get_json()
+        user_name = content['username']
+        name = content['name']
+        surname = content['surname']
+        url = content['urlImageProfile']
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            user.change(user_name, name, surname, url)
+            response = jsonify({'message': 'User changed'})
+            response.status_code = 200
+        except (InvalidMail, SignedMail, UserNotRegistered) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    def get(cls):
+        """post method"""
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            response = jsonify(user.serialize())
+            response.status_code = 200
+        except InvalidCookie as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
@@ -117,7 +156,7 @@ class DeleteUser(Resource):
         User.delete_user_with_mail(mail)
 
 
-class CreateOrganization(Resource):
+class Organizations(Resource):
     """create new orga"""
     @classmethod
     def post(cls):
@@ -130,20 +169,41 @@ class CreateOrganization(Resource):
 
         session_cookie = request.cookies.get('session')
         try:
-            creator_user_id = User.get_user_with_cookie(session_cookie)
-            orga = Organization.create(org_name, url_image, creator_user_id,
+            creator_user = User.get_user_with_cookie(session_cookie)
+            orga = Organization.create(org_name, url_image, creator_user.id,
                                        description, welcome_message)
-            data = {'id': orga.id,
+            data = {'name': orga.name,
                     'message': 'orga added'
                     }
 
             response = jsonify(data)
             response.status_code = 200
-        except(InvalidOrganizationName, SignedOrganization) as error:
-            response = jsonify(error.message)
+        except(InvalidOrganizationName, SignedOrganization,
+               InvalidCookie) as error:
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
-        except InvalidCookie:
-            return redirect('/login')
+        return response
+
+
+class UserOrganizations(Resource):
+    """ orrganization from users"""
+    @classmethod
+    def get(cls):
+        """ get users orgas """
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            orgas = user.get_organizations()
+
+            list_of_orgas = []
+            for orga in orgas:
+                list_of_orgas.append(orga.get_name_and_url())
+
+            response = jsonify(list_of_orgas)
+            response.status_code = 200
+        except InvalidCookie as error:
+            response.data = jsonify({'message': error.message})
+            response.status_code = error.code
         return response
 
 
@@ -166,38 +226,51 @@ class OrganizationMembers(Resource):
 
             response = jsonify(data)
             response.status_code = 200
-        except(UserIsAlredyInOrganization) as error:
-            response = jsonify(error.message)
+        except(UserIsAlredyInOrganization, UserIsNotCreator,
+               InvalidCookie) as error:
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
-        except UserIsNotAdmin as error:
-            response = jsonify(error.message)
-            response.status_code = error.code
-        except InvalidCookie:
-            return redirect('/login')
         return response
 
 
-class Organizations(Resource):
-    """ manage orga """
+class OrganizationMembersLocations(Resource):
+    """ locations of the members """
     @classmethod
     def get(cls):
-        """ get users orgas """
+        """get location of the members"""
+        content = request.get_json()
+        org_name = content['org_name']
+
         session_cookie = request.cookies.get('session')
         try:
-            user = User.get_user_with_cookie(session_cookie)
-            orgas = user.get_organizations()
-
-            list_of_orgas = []
-            for orga in orgas:
-                current_orga_dict = {}
-                current_orga_dict['name'] = orga.name
-                current_orga_dict['urlImage'] = orga.url
-                list_of_orgas.append(current_orga_dict)
-
-            response = jsonify(list_of_orgas)
+            User.get_user_with_cookie(session_cookie)
+            orga = Organization.get_organization_by_name(org_name)
+            users = orga.get_users_location()
+            response = jsonify(users)
             response.status_code = 200
-        except InvalidCookie:
-            return redirect('/login')
+        except(InvalidCookie, InvalidOrganization) as error:
+            response.data = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+class UserOrganizationsChannels(Resource):
+    """ channels in organization from user """
+    @classmethod
+    def get(cls):
+        """get channels in organization where the user is"""
+        content = request.get_json()
+        org_name = content['org_name']
+        session_cookie = request.cookies.get('session')
+        try:
+            User.get_user_with_cookie(session_cookie)
+            orga = Organization.get_organization_by_name(org_name)
+            data = orga.serialize()
+            response = jsonify(data)
+            response.status_code = 200
+        except(InvalidCookie, InvalidOrganization) as error:
+            response.data = jsonify({'message': error.message})
+            response.status_code = error.code
         return response
 
 
