@@ -40,7 +40,7 @@ api.add_resource(routes.Organizations, '/organizations')
 api.add_resource(routes.UserOrganizations, '/user/organizations')
 api.add_resource(routes.UserOrganizationsChannels,
                  '/user/organizations/channels')
-# api.add_resource(routes.CreateOrganization, '/organization')
+api.add_resource(routes.Organizations, '/organizations')
 # api.add_resource(routes.ShowOrganization, '/myorganizations')
 api.add_resource(routes.Users, '/users')
 api.add_resource(routes.DeleteUsers, '/delete')

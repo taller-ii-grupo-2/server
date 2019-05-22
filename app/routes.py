@@ -137,7 +137,6 @@ class Logout(Resource):
 
         return response
 
-
 class DeleteUsers(Resource):
     """delete users endpoint"""
     @classmethod
@@ -164,7 +163,7 @@ class Organizations(Resource):
         content = request.get_json()
         org_name = content['name']
         description = content['description']
-        welcome_message = content['welcome_message']
+        welcome_message = content['welcomMsg']
         url_image = content['urlImage']
 
         session_cookie = request.cookies.get('session')
