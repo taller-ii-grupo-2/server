@@ -137,6 +137,7 @@ class Logout(Resource):
 
         return response
 
+
 class DeleteUsers(Resource):
     """delete users endpoint"""
     @classmethod
@@ -160,15 +161,11 @@ class Organizations(Resource):
     @classmethod
     def post(cls):
         """post method"""
-        try:
-            content = request.get_json()
-            org_name = content['name']
-            description = content['description']
-            welcome_message = content['welcomMsg']
-            url_image = content['urlImage']
-        except:
-            response.status_code = 500
-            response.data = jsonify({'message': "error reading sent json"})
+        content = request.get_json()
+        org_name = content['name']
+        description = content['description']
+        welcome_message = content['welcomMsg']
+        url_image = content['urlImage']
 
         session_cookie = request.cookies.get('session')
         try:
@@ -187,7 +184,7 @@ class Organizations(Resource):
         except SignedOrganization as error:
             response.data = jsonify({'message': "signed orga"})
             response.status_code = error.code
-        except InvalidCookie as error: 
+        except InvalidCookie as error:
             response.data = jsonify({'message': "invalid cookie"})
             response.status_code = error.code
         return response
