@@ -181,9 +181,14 @@ class Organizations(Resource):
 
             response = jsonify(data)
             response.status_code = 200
-        except(InvalidOrganizationName, SignedOrganization,
-               InvalidCookie) as error:
-            response.data = jsonify({'message': error.message})
+        except InvalidOrganizationName as error:
+            response.data = jsonify({'message': "invalid orga name"})
+            response.status_code = error.code
+        except SignedOrganization as error:
+            response.data = jsonify({'message': "signed orga"})
+            response.status_code = error.code
+        except InvalidCookie as error: 
+            response.data = jsonify({'message': "invalid cookie"})
             response.status_code = error.code
         return response
 
