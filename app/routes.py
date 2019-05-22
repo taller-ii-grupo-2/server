@@ -160,11 +160,15 @@ class Organizations(Resource):
     @classmethod
     def post(cls):
         """post method"""
-        content = request.get_json()
-        org_name = content['name']
-        description = content['description']
-        welcome_message = content['welcomMsg']
-        url_image = content['urlImage']
+        try:
+            content = request.get_json()
+            org_name = content['name']
+            description = content['description']
+            welcome_message = content['welcomMsg']
+            url_image = content['urlImage']
+        except:
+            response.status_code = 500
+            response.data = jsonify({'message': "error reading sent json"})
 
         session_cookie = request.cookies.get('session')
         try:
