@@ -169,7 +169,7 @@ class Organizations(Resource):
 
         session_cookie = request.cookies.get('session')
         try:
-            creator_user = User.get_user_with_cookie(session_cookie)
+            creator_user = User.get_user_with_cookie(session_cookie).id
             orga = Organization.create(org_name, url_image, creator_user.id,
                                        description, welcome_message)
             data = {'name': orga.name,
