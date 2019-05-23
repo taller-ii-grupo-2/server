@@ -7,7 +7,7 @@ from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
 from app.exceptions import SignedOrganization
-from app import app, socketio
+from app import app  # , socketio
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
 from app.exceptions import InvalidCookie, UserIsNotCreator
@@ -324,25 +324,24 @@ def deliver_msg(msg_body, org_name, channel_name, author_id, timestamp):
             sid = User.get_user_by_id(user).sid
             emit('message', msg_dict, room=sid)
 
-
-#@socketio.on('message')
-#def handle_message(msg):
+# @socketio.on('message')
+# def handle_message(msg):
 #    """save msg to db and deliver it to connected people"""
 #    user = User.get_user_by_sid(request.sid)
 #    app.logger.info('Received msg: ' + msg)  # pylint: disable=no-member
 #    save_msg(msg, user.id)
 
 
-#@socketio.on('connect')
-#def handle_new_connection():
+# @socketio.on('connect')
+# def handle_new_connection():
 #    """log new connection"""
 #    # pylint: disable=no-member
 #    app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
 #    # pylint: enable=no-member
 
 
-#@socketio.on('identification')
-#def identify_connected_user(mail):
+# @socketio.on('identification')
+# def identify_connected_user(mail):
 #    """match user with sid (session unique id)"""
 #    # pylint: disable=no-member
 #    app.logger.info('identifying... mail: ' + mail)
@@ -355,8 +354,8 @@ def deliver_msg(msg_body, org_name, channel_name, author_id, timestamp):
 #    # pylint: enable=no-member
 
 
-#@socketio.on('disconnect')
-#def disconnect_socket_user():
+# @socketio.on('disconnect')
+# def disconnect_socket_user():
 #    """handle user disconnection"""
 #    sid = request.sid
 #    user = User.get_user_by_sid(sid)  # pylint: disable=no-member
