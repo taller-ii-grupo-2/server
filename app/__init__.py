@@ -3,7 +3,7 @@ from flask import Flask
 from app.config import Config
 from flask_sqlalchemy import SQLAlchemy
 from flask_restful import Api
-from flask_socketio import SocketIO
+# from flask_socketio import SocketIO
 import logging
 import time
 import firebase_admin
@@ -16,7 +16,7 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 api = Api(app)
-socketio = SocketIO(app)
+# socketio = SocketIO(app)
 
 logging.Formatter.converter = time.localtime
 logging.basicConfig(
