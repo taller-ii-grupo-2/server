@@ -41,6 +41,9 @@ class Organization(db.Model):
     description = db.Column(
         db.String(constant.MAX_ORGANIZATION_DESCRIPTION_LENGTH),
         nullable=False)
+    welcome_message = db.Column(
+        db.String(constant.MAX_ORGANIZATION_WELCOME_MSG_LENGTH),
+        nullable=False)
 
     # pylint: disable = R0913
     # pylint: disable = R0801
