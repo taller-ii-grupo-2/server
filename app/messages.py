@@ -16,7 +16,7 @@ class Message(db.Model):
     channel = db.Column(db.String(constant.MAX_CHANNEL_NAME_LENGTH),
                         nullable=True)
 
-    # destinatario en caso de msj directo.
+    # id del destinatario en caso de msj directo.
     dm_dest = db.Column(db.Integer, nullable=True)
 
     # In general, you will want to work with UTC dates and times in a server
@@ -26,7 +26,7 @@ class Message(db.Model):
     # -part-iv-database
     timestamp = db.Column(db.DateTime, index=True,
                           default=datetime.utcnow)
-    author_id = db.Column(db.Integer)
+    author_mail = db.Column(db.String(constant.MAX_MAIL_LENGTH))
 
     body = db.Column(db.String(constant.MAX_MSG_BODY_LENGTH), nullable=False)
 #    events_author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
