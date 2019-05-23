@@ -171,12 +171,9 @@ class Organizations(Resource):
         session_cookie = request.cookies.get('session')
         try:
             creator_user = User.get_user_with_cookie(session_cookie)
-            orga = Organization.create(org_name, url_image, creator_user.id,
-                                       description, welcome_message)
-            data = {'name': orga.name,
-                    'message': 'orga added'
-                    }
-
+            Organization.create(org_name, url_image, creator_user.id,
+                                description, welcome_message)
+            data = {'message': 'orga added'}
             response = jsonify(data)
             response.status_code = 200
         except(InvalidOrganizationName, SignedOrganization,
