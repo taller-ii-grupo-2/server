@@ -325,42 +325,42 @@ def deliver_msg(msg_body, org_name, channel_name, author_id, timestamp):
             emit('message', msg_dict, room=sid)
 
 
-@socketio.on('message')
-def handle_message(msg):
-    """save msg to db and deliver it to connected people"""
-    user = User.get_user_by_sid(request.sid)
-    app.logger.info('Received msg: ' + msg)  # pylint: disable=no-member
-    save_msg(msg, user.id)
+#@socketio.on('message')
+#def handle_message(msg):
+#    """save msg to db and deliver it to connected people"""
+#    user = User.get_user_by_sid(request.sid)
+#    app.logger.info('Received msg: ' + msg)  # pylint: disable=no-member
+#    save_msg(msg, user.id)
 
 
-@socketio.on('connect')
-def handle_new_connection():
-    """log new connection"""
-    # pylint: disable=no-member
-    app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
-    # pylint: enable=no-member
+#@socketio.on('connect')
+#def handle_new_connection():
+#    """log new connection"""
+#    # pylint: disable=no-member
+#    app.logger.info('new connnectionn: sid ' + request.sid + ' connected.')
+#    # pylint: enable=no-member
 
 
-@socketio.on('identification')
-def identify_connected_user(mail):
-    """match user with sid (session unique id)"""
-    # pylint: disable=no-member
-    app.logger.info('identifying... mail: ' + mail)
-    # pylint: enable=no-member
-    sid = request.sid
-    user = User.get_user_by_mail(mail)
-    user.udpate_sid(sid)
-    # pylint: disable=no-member
-    app.logger.info('identified user ' + mail + ' with sid ' + sid)
-    # pylint: enable=no-member
+#@socketio.on('identification')
+#def identify_connected_user(mail):
+#    """match user with sid (session unique id)"""
+#    # pylint: disable=no-member
+#    app.logger.info('identifying... mail: ' + mail)
+#    # pylint: enable=no-member
+#    sid = request.sid
+#    user = User.get_user_by_mail(mail)
+#    user.udpate_sid(sid)
+#    # pylint: disable=no-member
+#    app.logger.info('identified user ' + mail + ' with sid ' + sid)
+#    # pylint: enable=no-member
 
 
-@socketio.on('disconnect')
-def disconnect_socket_user():
-    """handle user disconnection"""
-    sid = request.sid
-    user = User.get_user_by_sid(sid)  # pylint: disable=no-member
-    user.udpate_sid(' ')
-    # pylint: disable=no-member
-    app.logger.info('user with sid ' + sid + ' disconnected.')
-    # pylint: enable=no-member
+#@socketio.on('disconnect')
+#def disconnect_socket_user():
+#    """handle user disconnection"""
+#    sid = request.sid
+#    user = User.get_user_by_sid(sid)  # pylint: disable=no-member
+#    user.udpate_sid(' ')
+#    # pylint: disable=no-member
+#    app.logger.info('user with sid ' + sid + ' disconnected.')
+#    # pylint: enable=no-member
