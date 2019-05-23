@@ -160,6 +160,7 @@ class Organizations(Resource):
     """create new orga"""
     @classmethod
     def post(cls):
+        # pylint: disable = W0702
         """post method"""
         content = request.get_json()
         org_name = content['name']
@@ -178,15 +179,13 @@ class Organizations(Resource):
 
             response = jsonify(data)
             response.status_code = 200
-        except InvalidOrganizationName as error:
-            response.data = jsonify({'message': "invalid orga name"})
+        except(InvalidOrganizationName, SignedOrganization,
+               InvalidCookie) as error:
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
-        except SignedOrganization as error:
-            response.data = jsonify({'message': "signed orga"})
-            response.status_code = error.code
-        except InvalidCookie as error:
-            response.data = jsonify({'message': "invalid cookie"})
-            response.status_code = error.code
+        except:  # noqa: E722
+            response.data = jsonify({'message': "sql data error"})
+            response.status_code = 500
         return response
 
 
