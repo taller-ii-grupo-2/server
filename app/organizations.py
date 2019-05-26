@@ -197,10 +197,12 @@ class Organization(db.Model):
 
     def get_name_and_url(self):
         """ gets name and url of organization"""
-        return {
+        app.logger.info('getting data from: ' + self.name + ", " + self.url)
+        my_dict = {
             'name': self.name,
             'url': self.url
         }
+        return my_dict
 
     def get_users_location(self):
         """ gets location of users in organization """

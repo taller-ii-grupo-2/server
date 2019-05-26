@@ -167,6 +167,7 @@ class User(db.Model):
         orgas = []
         for orga in self.organizations:
             orgas.append(orga.serialize())
+        app.logger.info('orgas on get: ' + str(orgas))
         return orgas
 
     def make_admin_user(self, user, orga):

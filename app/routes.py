@@ -211,7 +211,8 @@ class UserOrganizations(Resource):
 
             list_of_orgas = []
             for orga in orgas:
-                list_of_orgas.append(orga.get_name_and_url())
+                orga_dict = {'name': orga['name'], 'urlImage': orga['url']}
+                list_of_orgas.append(orga_dict)
 
             response = jsonify(list_of_orgas)
             response.status_code = 200
