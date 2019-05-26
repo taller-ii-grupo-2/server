@@ -54,6 +54,7 @@ class FbUser():
         claims = FbUser.get_claims(cookie)
         app.logger.info('claims : ' + str(claims))
         app.logger.info('to return: ' + str(auth.get_user(claims['uid'])))
+        return auth.get_user(claims['uid'])
 
     @staticmethod
     def delete_user_with_email(mail):

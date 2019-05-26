@@ -2,7 +2,7 @@
 import re
 from sqlalchemy.orm import validates
 from app.fb_user import FbUser
-from app import db
+from app import db, app
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidUser
 from app.exceptions import UserIsNotCreator
@@ -91,6 +91,7 @@ class User(db.Model):
     def get_user_with_cookie(cookie):
         """ verifies if cookie is valid and return user id """
         fb_user = FbUser.get_user_with_cookie(cookie)
+        app.logger.info('our user: ' + str(User.get_user_by_mail(fb_user.email)))
         return User.get_user_by_mail(fb_user.email)
 
     @validates('mail')
