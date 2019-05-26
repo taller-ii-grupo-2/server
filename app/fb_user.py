@@ -3,6 +3,7 @@ import datetime
 from firebase_admin import auth
 from app.exceptions import InvalidCookie, InvalidToken
 from app.exceptions import UserNotRegistered
+from app import app
 
 
 class FbUser():
@@ -49,8 +50,10 @@ class FbUser():
     @staticmethod
     def get_user_with_cookie(cookie):
         """logout user with coookie"""
+        app.logger.info('cookie: ' + str(cookie))
         claims = FbUser.get_claims(cookie)
-        return auth.get_user(claims['sub'])
+        app.logger.info('claims : ' + str(claims))
+        app.logger.info('to return: ' + str(auth.get_user(claims['uid'])))
 
     @staticmethod
     def delete_user_with_email(mail):
