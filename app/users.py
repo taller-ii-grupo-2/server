@@ -91,7 +91,6 @@ class User(db.Model):
     def get_user_with_cookie(cookie):
         """ verifies if cookie is valid and return user id """
         fb_user = FbUser.get_user_with_cookie(cookie)
-        app.logger.info('our user: ' + str(User.get_user_by_mail(fb_user.email)))
         return User.get_user_by_mail(fb_user.email)
 
     @validates('mail')
@@ -167,7 +166,9 @@ class User(db.Model):
         orgas = []
         for orga in self.organizations:
             orgas.append(orga.serialize())
+        # pylint: disable=no-member
         app.logger.info('orgas on get: ' + str(orgas))
+        # pylint: enable=no-member
         return orgas
 
     def make_admin_user(self, user, orga):

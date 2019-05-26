@@ -197,7 +197,6 @@ class Organization(db.Model):
 
     def get_name_and_url(self):
         """ gets name and url of organization"""
-        app.logger.info('getting data from: ' + self.name + ", " + self.url)
         my_dict = {
             'name': self.name,
             'url': self.url

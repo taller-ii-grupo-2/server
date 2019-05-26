@@ -61,10 +61,10 @@ class Users(Resource):
         try:
             User.add_user(user_name, name, surname, mail, latitude,
                           longitude, url)
-            response.data = jsonify({'message': 'User added'})
+            response = jsonify({'message': 'User added'})
             response.status_code = 200
         except (InvalidMail, SignedMail, UserNotRegistered) as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -80,10 +80,10 @@ class Users(Resource):
         try:
             user = User.get_user_with_cookie(session_cookie)
             user.change(user_name, name, surname, url)
-            response.data = jsonify({'message': 'User changed'})
+            response = jsonify({'message': 'User changed'})
             response.status_code = 200
         except (InvalidMail, SignedMail, UserNotRegistered) as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -93,10 +93,10 @@ class Users(Resource):
         session_cookie = request.cookies.get('session')
         try:
             user = User.get_user_with_cookie(session_cookie)
-            response.data = jsonify(user.serialize())
+            response = jsonify(user.serialize())
             response.status_code = 200
         except InvalidCookie as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -115,7 +115,7 @@ class Login(Resource):
                 'session', cookie, expires=expires, httponly=True, secure=True)
             response.status_code = 200
         except InvalidToken as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -128,11 +128,11 @@ class Logout(Resource):
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_claims(session_cookie)
-            response.data = jsonify({'message': 'User Logged out'})
+            response = jsonify({'message': 'User Logged out'})
             response.set_cookie('session', expires=0)
             response.status_code = 200
         except InvalidCookie as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
 
         return response
@@ -163,7 +163,7 @@ class Organizations(Resource):
         # pylint: disable = W0702
         """post method"""
         # pylint: disable=no-member
-        app.logger.info('in orga creation')  
+        app.logger.info('in orga creation')
         content = request.get_json(force=True)
         app.logger.info('Received content: ' + str(content))
         org_name = content['name']
@@ -216,7 +216,9 @@ class UserOrganizations(Resource):
 
             response = jsonify(list_of_orgas)
             response.status_code = 200
+            # pylint: disable=no-member
             app.logger.info('sending orgas: ' + str(response.data))
+            # pylint: enable=no-member
         except InvalidCookie as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
@@ -240,11 +242,11 @@ class OrganizationMembers(Resource):
 
             data = {'message': 'user added'}
 
-            response.data = jsonify(data)
+            response = jsonify(data)
             response.status_code = 200
         except(UserIsAlredyInOrganization, UserIsNotCreator,
                InvalidCookie) as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -262,10 +264,10 @@ class OrganizationMembersLocations(Resource):
             User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
             users = orga.get_users_location()
-            response.data = jsonify(users)
+            response = jsonify(users)
             response.status_code = 200
         except(InvalidCookie, InvalidOrganization) as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -282,12 +284,13 @@ class UserOrganizationsChannels(Resource):
             User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
             data = orga.serialize()
-            response.data = jsonify(data)
+            response = jsonify(data)
             response.status_code = 200
         except(InvalidCookie, InvalidOrganization) as error:
-            response.data = jsonify({'message': error.message})
+            response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
+
 
 def save_msg(msg, user_id):
     """ save received msg to db """
@@ -372,6 +375,7 @@ def identify_connected_user(mail):
 @socketio.on('disconnect')
 def disconnect_socket_user():
     """handle user disconnection"""
+    # pylint: disable=no-member
     sid = request.sid
     user = User.get_user_by_sid(sid)  # pylint: disable=no-member
     app.logger.info('user disconnected: ' + sid + ", " + user.mail)
