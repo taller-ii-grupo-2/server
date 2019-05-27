@@ -49,8 +49,10 @@ class FbUser():
     @staticmethod
     def get_user_with_cookie(cookie):
         """logout user with coookie"""
+        # pylint: disable=no-member
         claims = FbUser.get_claims(cookie)
-        return auth.get_user(claims['sub'])
+        # pylint: enable=no-member
+        return auth.get_user(claims['uid'])
 
     @staticmethod
     def delete_user_with_email(mail):

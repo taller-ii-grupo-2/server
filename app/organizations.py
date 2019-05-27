@@ -23,7 +23,7 @@ class Organization(db.Model):
     name = db.Column(
         db.String(constant.MAX_ORGANIZATION_NAME_LENGTH),
         nullable=False)
-    url = db.Column(db.String())
+    url = db.Column(db.String(300))
     # In general, you will want to work with UTC dates and times in a server
     # application. This ensures that you are using uniform timestamps
     # regardless of where the users are located.
@@ -197,10 +197,11 @@ class Organization(db.Model):
 
     def get_name_and_url(self):
         """ gets name and url of organization"""
-        return {
+        my_dict = {
             'name': self.name,
             'url': self.url
         }
+        return my_dict
 
     def get_users_location(self):
         """ gets location of users in organization """

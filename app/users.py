@@ -2,7 +2,7 @@
 import re
 from sqlalchemy.orm import validates
 from app.fb_user import FbUser
-from app import db
+from app import db, app
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidUser
 from app.exceptions import UserIsNotCreator
@@ -22,7 +22,7 @@ class User(db.Model):
     longitude = db.Column(db.Float(), nullable=False)
     latitude = db.Column(db.Float(), nullable=False)
     url = db.Column(db.String(), nullable=False, server_default=' ')
-    sid = db.Column(db.String(20), nullable=True, server_default=' ')
+    sid = db.Column(db.String(32), nullable=True, server_default=' ')
     organizations = db.relationship(
         'Organization',
         secondary=ORGS,
@@ -166,6 +166,9 @@ class User(db.Model):
         orgas = []
         for orga in self.organizations:
             orgas.append(orga.serialize())
+        # pylint: disable=no-member
+        app.logger.info('orgas on get: ' + str(orgas))
+        # pylint: enable=no-member
         return orgas
 
     def make_admin_user(self, user, orga):
