@@ -132,7 +132,7 @@ class Logout(Resource):
             response.set_cookie('session', expires=0)
             response.status_code = 200
         except InvalidCookie as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
 
         return response
@@ -162,36 +162,26 @@ class Organizations(Resource):
     def post(cls):
         # pylint: disable = W0702
         """post method"""
-        # pylint: disable=no-member
-        app.logger.info('in orga creation')
-        content = request.get_json(force=True)
-        app.logger.info('Received content: ' + str(content))
+        content = request.get_json()
         org_name = content['name']
         description = content['description']
         welcome_message = content['welcomMsg']
         url_image = content['urlImage']
 
-        app.logger.info('org_name: ' + str(org_name))
-        app.logger.info('description: ' + str(description))
-        app.logger.info('welcome_message: ' + str(welcome_message))
-        app.logger.info('url_image: ' + str(url_image))
         session_cookie = request.cookies.get('session')
-        # pylint: disable=no-member
         try:
             creator_user = User.get_user_with_cookie(session_cookie)
-            app.logger.info('creator_user_id: ' + str(creator_user))
-            Organization.create(org_name, url_image, creator_user,
+            Organization.create(org_name, url_image, creator_user.id,
                                 description, welcome_message)
             data = {'message': 'orga added'}
             response = jsonify(data)
             response.status_code = 200
         except(InvalidOrganizationName, SignedOrganization,
                InvalidCookie) as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
         except:  # noqa: E722
-            data = {'message': 'sql data error'}
-            response = jsonify(data)
+            response.data = jsonify({'message': "sql data error"})
             response.status_code = 500
         return response
 
@@ -201,26 +191,19 @@ class UserOrganizations(Resource):
     @classmethod
     def get(cls):
         """ get users orgas """
-        # pylint: disable=no-member
-        app.logger.info('in users organizations')
         session_cookie = request.cookies.get('session')
-        # pylint: enable=no-member
         try:
             user = User.get_user_with_cookie(session_cookie)
             orgas = user.get_organizations()
 
             list_of_orgas = []
             for orga in orgas:
-                orga_dict = {'name': orga['name'], 'urlImage': orga['url']}
-                list_of_orgas.append(orga_dict)
+                list_of_orgas.append(orga.get_name_and_url())
 
             response = jsonify(list_of_orgas)
             response.status_code = 200
-            # pylint: disable=no-member
-            app.logger.info('sending orgas: ' + str(response.data))
-            # pylint: enable=no-member
         except InvalidCookie as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -246,7 +229,7 @@ class OrganizationMembers(Resource):
             response.status_code = 200
         except(UserIsAlredyInOrganization, UserIsNotCreator,
                InvalidCookie) as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -256,9 +239,7 @@ class OrganizationMembersLocations(Resource):
     @classmethod
     def get(cls):
         """get location of the members"""
-        content = request.get_json()
-        org_name = content['org_name']
-
+        org_name = request.args['org_name']
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_with_cookie(session_cookie)
@@ -267,7 +248,7 @@ class OrganizationMembersLocations(Resource):
             response = jsonify(users)
             response.status_code = 200
         except(InvalidCookie, InvalidOrganization) as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -277,8 +258,7 @@ class UserOrganizationsChannels(Resource):
     @classmethod
     def get(cls):
         """get channels in organization where the user is"""
-        content = request.get_json()
-        org_name = content['org_name']
+        org_name = request.args['org_name']
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_with_cookie(session_cookie)
@@ -287,7 +267,7 @@ class UserOrganizationsChannels(Resource):
             response = jsonify(data)
             response.status_code = 200
         except(InvalidCookie, InvalidOrganization) as error:
-            response = jsonify({'message': error.message})
+            response.data = jsonify({'message': error.message})
             response.status_code = error.code
         return response
 
@@ -375,8 +355,9 @@ def identify_connected_user(mail):
 @socketio.on('disconnect')
 def disconnect_socket_user():
     """handle user disconnection"""
-    # pylint: disable=no-member
     sid = request.sid
     user = User.get_user_by_sid(sid)  # pylint: disable=no-member
-    app.logger.info('user disconnected: ' + sid + ", " + user.mail)
     user.udpate_sid(' ')
+    # pylint: disable=no-member
+    app.logger.info('user with sid ' + sid + ' disconnected.')
+    # pylint: enable=no-member
