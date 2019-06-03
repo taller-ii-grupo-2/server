@@ -3,6 +3,7 @@ import json
 from flask import request, jsonify
 from flask_restful import Resource
 from flask_socketio import emit
+import sqlalchemy.exc as sql
 from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
@@ -13,6 +14,8 @@ from app.exceptions import InvalidToken, UserNotRegistered
 from app.exceptions import InvalidCookie, UserIsNotCreator
 from app.exceptions import UserIsAlredyInOrganization
 from app.exceptions import InvalidOrganization
+from app.exceptions import AlreadyCreatedChannel
+from app.exceptions import UserNotInOrganization, InvalidChannelName
 from app.messages import Message
 from app.channels import Channel
 
@@ -254,10 +257,8 @@ class OrganizationMembers(Resource):
 class OrganizationMembersLocations(Resource):
     """ locations of the members """
     @classmethod
-    def get(cls):
+    def get(cls, org_name):
         """get location of the members"""
-        content = request.get_json()
-        org_name = content['org_name']
 
         session_cookie = request.cookies.get('session')
         try:
@@ -275,10 +276,8 @@ class OrganizationMembersLocations(Resource):
 class UserOrganizationsChannels(Resource):
     """ channels in organization from user """
     @classmethod
-    def get(cls):
+    def get(cls, org_name):
         """get channels in organization where the user is"""
-        content = request.get_json()
-        org_name = content['org_name']
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_with_cookie(session_cookie)
@@ -287,6 +286,33 @@ class UserOrganizationsChannels(Resource):
             response = jsonify(data)
             response.status_code = 200
         except(InvalidCookie, InvalidOrganization) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+class Channels(Resource):
+    """ manage channels in organizations """
+    @classmethod
+    def post(cls):
+        """ create channel in organization """
+        content = request.get_json()
+        org_name = content['nameOrga']
+        channel_name = content['channel_name']
+        public = content['public']
+        description = content['desc']
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            orga = Organization.get_organization_by_name(org_name)
+            orga.create_channel(channel_name, public, user,
+                                description, 'wm')
+            data = {'message': 'user added'}
+            response = jsonify(data)
+            response.status_code = 200
+        except(InvalidCookie, AlreadyCreatedChannel,
+               UserNotInOrganization, sql.DataError,
+               InvalidChannelName) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
