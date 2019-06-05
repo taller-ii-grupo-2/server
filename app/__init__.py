@@ -22,7 +22,7 @@ logging.Formatter.converter = time.localtime
 logging.basicConfig(
         format='%(asctime)s - %(levelname)s - %(message)s',
         datefmt='%Y-%m-%d %H:%M:%S',
-        filename='log/basic.log',
+        # filename='log/basic.log',
         level=logging.DEBUG)
 
 from app import routes, users  # noqa: E402, F401
