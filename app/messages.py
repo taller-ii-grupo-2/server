@@ -17,7 +17,7 @@ class Message(db.Model):
                         nullable=True)
 
     # destinatario en caso de msj directo.
-    dm_dest = db.Column(db.Integer, nullable=True)
+    dm_dest_mail = db.Column(db.String(32), nullable=True)
 
     # In general, you will want to work with UTC dates and times in a server
     # application. This ensures that you are using uniform timestamps
@@ -26,7 +26,7 @@ class Message(db.Model):
     # -part-iv-database
     timestamp = db.Column(db.DateTime, index=True,
                           default=datetime.utcnow)
-    author_id = db.Column(db.Integer)
+    author_mail = db.Column(db.String(32))
 
     body = db.Column(db.String(constant.MAX_MSG_BODY_LENGTH), nullable=False)
 #    events_author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
