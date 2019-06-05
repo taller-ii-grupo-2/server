@@ -11,7 +11,7 @@ from app.exceptions import SignedOrganization
 from app import app, socketio
 from app.exceptions import InvalidMail, SignedMail
 from app.exceptions import InvalidToken, UserNotRegistered
-from app.exceptions import InvalidCookie, UserIsNotCreator
+from app.exceptions import InvalidCookie, InvalidUser
 from app.exceptions import UserIsAlredyInOrganization
 from app.exceptions import InvalidOrganization
 from app.exceptions import AlreadyCreatedChannel
@@ -238,7 +238,7 @@ class OrganizationMembers(Resource):
         mail_of_user_to_add = content['mail_of_user_to_add']
         session_cookie = request.cookies.get('session')
         try:
-            adder_user = User.get_user_with_cookie(session_cookie)
+            User.get_user_with_cookie(session_cookie)
             user_to_add = User.get_user_by_mail(mail_of_user_to_add)
             orga = Organization.get_organization_by_name(org_name)
             orga.add_user(user_to_add)
@@ -247,8 +247,8 @@ class OrganizationMembers(Resource):
 
             response = jsonify(data)
             response.status_code = 200
-        except(UserIsAlredyInOrganization, UserIsNotCreator,
-               InvalidCookie) as error:
+        except(UserIsAlredyInOrganization, InvalidOrganization,
+               InvalidCookie, InvalidUser) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
