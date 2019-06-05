@@ -33,12 +33,12 @@ class Message(db.Model):
 #    user = relationship("User")
 
     # pylint: disable = R0913
-    def __init__(self, organization, channel, dm_dest, author_id, body):
+    def __init__(self, organization, channel, dm_dest_mail, author_mail, body):
         """ initializes table """
         self.organization = organization
         self.channel = channel
-        self.dm_dest = dm_dest
-        self.author_id = author_id
+        self.dm_dest_mail = dm_dest_mail
+        self.author_mail = author_mail
         self.body = body
 
     def __repr__(self):
@@ -58,13 +58,13 @@ class Message(db.Model):
 
     # pylint: disable = R0913
     @staticmethod
-    def add_message(org, channel, dm_dest_mail, author_mail, body):
+    def add_message(org, channel, dm_dest, author_mail, body):
         """ adds msg to table """
         try:
             msg = Message(
                 organization=org,
                 channel=channel,
-                dm_dest_mail=dm_dest_mail,
+                dm_dest_mail=dm_dest,
                 author_mail=author_mail,
                 body=body
             )
@@ -75,15 +75,21 @@ class Message(db.Model):
         app.logger.info('added msg to db: ' + msg)  # pylint: disable=no-member
         return msg
 
-    def get_channel_messages(self, orga_name, channel_name):
-        return db.session.query(Message).\
-                filter_by(organization = orga_name, channel = channel_name)
+    @staticmethod
+    def get_channel_messages(orga_name, channel_name):
+        """ retrieve all msgs for given orga/channel"""
+        # pylint: disable = E1101
+        return db.session.query(Message).filter_by(
+            organization=orga_name, channel=channel_name)
 
-    def get_dms(self, orga_name, dm_dest_mail, asker_mail):
-        return db.session.query(Message).\
-                filter_by(dm_dest_mail = dm_dest_mail).\
-                filter_by(dm_dest_mail = asker_mail).\
-                filter_by(channel = channel_name)
+    @staticmethod
+    def get_dms(orga_name, dm_dest_mail, asker_mail):
+        """ get all private msgs for given org/users"""
+        # pylint: disable = E1101
+        return db.session.query(Message).filter_by(
+            dm_dest_mail=dm_dest_mail).filter_by(
+                dm_dest_mail=asker_mail).filter_by(
+                    organization=orga_name)
 
 #    @staticmethod
 #    def delete_all():
