@@ -334,6 +334,21 @@ class Channels(Resource):
             response.status_code = error.code
         return response
 
+class Messages(Resource):
+    """ manage general msgs (not private dms) """
+    @classmethod
+    def get(cls, orga_name, channel_name):
+        """get msgs of specified orga/channel"""
+        retrieved_msgs = Message.get_channel_messages(orga_name, channel_name)
+        msgs_to_send = []
+        for msg in retrieved_msgs:
+            author_mail = User.get_user_by_id(msg.author_id).mail
+            msgs_to_send.append({'timestamp': msg.timestamp,
+                'author_mail': author_mail,
+                'body': msg.body})
+        return msgs_to_send
+
+
 
 def save_msg(msg, user_id):
     """ save received msg to db """

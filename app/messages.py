@@ -75,6 +75,10 @@ class Message(db.Model):
         app.logger.info('added msg to db: ' + msg)  # pylint: disable=no-member
         return msg
 
+    def get_channel_messages(self, orga_name, channel_name):
+        return db.session.query(Message).\
+                filter_by(organization = orga_name, channel = channel_name)
+
 
 #    @staticmethod
 #    def delete_all():
