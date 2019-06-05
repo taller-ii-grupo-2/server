@@ -49,7 +49,7 @@ class User(db.Model):
         """ table to json """
         organizations = []
         for orga in self.organizations:
-            organizations.append(orga.getname_and_channels)
+            organizations.append(orga.get_name_and_channels())
 
         return {
             'name': self.name,

@@ -318,11 +318,9 @@ class Channels(Resource):
         channel_name = content['channel_name']
         public = content['public']
         description = content['desc']
-        mail = content['mail']
         session_cookie = request.cookies.get('session')
         try:
-            User.get_user_with_cookie(session_cookie)
-            user = User.get_user_by_mail(mail)
+            user = User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
             orga.create_channel(channel_name, public, user,
                                 description, 'wm')
