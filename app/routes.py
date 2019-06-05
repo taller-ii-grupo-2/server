@@ -278,6 +278,7 @@ class UserOrganizationsChannels(Resource):
     @classmethod
     def get(cls, org_name):
         """get channels in organization where the user is"""
+        # pylint: disable=no-member
         app.logger.info('in user organization channels')
         session_cookie = request.cookies.get('session')
         try:
@@ -292,14 +293,15 @@ class UserOrganizationsChannels(Resource):
             for member in orga.users:
                 member_mails.append(member.mail)
 
-            data = {'description':orga.description,
-                    'welcomMsg':orga.welcome_message,
-                    'urlImage':orga.url,
-                    'channels':channel_names,
-                    'members':member_mails}
+            data = {'description': orga.description,
+                    'welcomMsg': orga.welcome_message,
+                    'urlImage': orga.url,
+                    'channels': channel_names,
+                    'members': member_mails}
             response = jsonify(data)
             response.status_code = 200
             app.logger.info('sending data: ' + str(response.data))
+        # pylint: enable=no-member
         except(InvalidCookie, InvalidOrganization) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
