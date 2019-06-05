@@ -235,7 +235,7 @@ class OrganizationMembers(Resource):
         """add new member"""
         content = request.get_json()
         org_name = content['org_name']
-        mail_of_user_to_add = content['mail']
+        mail_of_user_to_add = content['mail_of_user_to_add']
         session_cookie = request.cookies.get('session')
         try:
             adder_user = User.get_user_with_cookie(session_cookie)
@@ -318,9 +318,11 @@ class Channels(Resource):
         channel_name = content['channel_name']
         public = content['public']
         description = content['desc']
+        mail = content['mail']
         session_cookie = request.cookies.get('session')
         try:
-            user = User.get_user_with_cookie(session_cookie)
+            User.get_user_with_cookie(session_cookie)
+            user = User.get_user_by_mail(mail)
             orga = Organization.get_organization_by_name(org_name)
             orga.create_channel(channel_name, public, user,
                                 description, 'wm')
