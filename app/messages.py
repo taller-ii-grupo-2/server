@@ -58,14 +58,14 @@ class Message(db.Model):
 
     # pylint: disable = R0913
     @staticmethod
-    def add_message(org, channel, dm_dest, author_id, body):
+    def add_message(org, channel, dm_dest_mail, author_mail, body):
         """ adds msg to table """
         try:
             msg = Message(
                 organization=org,
                 channel=channel,
-                dm_dest=dm_dest,
-                author_id=author_id,
+                dm_dest_mail=dm_dest_mail,
+                author_mail=author_mail,
                 body=body
             )
             db.session.add(msg)  # pylint: disable = E1101
@@ -79,6 +79,11 @@ class Message(db.Model):
         return db.session.query(Message).\
                 filter_by(organization = orga_name, channel = channel_name)
 
+    def get_dms(self, orga_name, dm_dest_mail, asker_mail):
+        return db.session.query(Message).\
+                filter_by(dm_dest_mail = dm_dest_mail).\
+                filter_by(dm_dest_mail = asker_mail).\
+                filter_by(channel = channel_name)
 
 #    @staticmethod
 #    def delete_all():

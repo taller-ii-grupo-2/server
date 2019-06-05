@@ -348,6 +348,21 @@ class Messages(Resource):
                 'body': msg.body})
         return msgs_to_send
 
+class PrivateMessages(Resource):
+    """ manage private msgs """
+    @classmethod
+    def get(csl, orga_name, dm_dest_mail):
+        """get private  msgs """
+        session_cookie = request.cookies.get('session')
+        asker_mail = User.get_user_with_cookie(session_cookie).mail
+
+        retrieved_msgs = Message.get_dms(orga_name, dm_dest_mail, asker_mail)
+        msgs_to_send = []
+        for msg in retrieved_msgs:
+            msgs_to_send.append({'timestamp': msg.timestamp,
+                'author_mail': author_mail,
+                'body': msg.body})
+        return msgs_to_send
 
 
 def save_msg(msg, user_id):
