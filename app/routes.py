@@ -278,13 +278,28 @@ class UserOrganizationsChannels(Resource):
     @classmethod
     def get(cls, org_name):
         """get channels in organization where the user is"""
+        app.logger.info('in user organization channels')
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
-            data = orga.serialize()
+            channel_names = []
+            member_mails = []
+
+            for channel in orga.channels:
+                channel_names.append(channel.name)
+
+            for member in orga.users:
+                member_mails.append(member.mail)
+
+            data = {'description':orga.description,
+                    'welcomMsg':orga.welcome_message,
+                    'urlImage':orga.url,
+                    'channels':channel_names,
+                    'members':member_mails}
             response = jsonify(data)
             response.status_code = 200
+            app.logger.info('sending data: ' + str(response.data))
         except(InvalidCookie, InvalidOrganization) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
