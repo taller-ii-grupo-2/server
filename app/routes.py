@@ -241,7 +241,7 @@ class OrganizationMembers(Resource):
             adder_user = User.get_user_with_cookie(session_cookie)
             user_to_add = User.get_user_by_mail(mail_of_user_to_add)
             orga = Organization.get_organization_by_name(org_name)
-            orga.add_user(adder_user, user_to_add)
+            orga.add_user(user_to_add)
 
             data = {'message': 'user added'}
 
