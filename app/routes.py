@@ -335,6 +335,38 @@ class Channels(Resource):
         return response
 
 
+class Messages(Resource):
+    """ manage general msgs (not private dms) """
+    @classmethod
+    def get(cls, orga_name, channel_name):
+        """get msgs of specified orga/channel"""
+        retrieved_msgs = Message.get_channel_messages(orga_name, channel_name)
+        msgs_to_send = []
+        for msg in retrieved_msgs:
+            author_mail = User.get_user_by_id(msg.author_id).mail
+            msgs_to_send.append({'timestamp': msg.timestamp,
+                                 'author_mail': author_mail,
+                                 'body': msg.body})
+        return msgs_to_send
+
+
+class PrivateMessages(Resource):
+    """ manage private msgs """
+    @classmethod
+    def get(cls, orga_name, dm_dest_mail):
+        """get private  msgs """
+        session_cookie = request.cookies.get('session')
+        asker_mail = User.get_user_with_cookie(session_cookie).mail
+
+        retrieved_msgs = Message.get_dms(orga_name, dm_dest_mail, asker_mail)
+        msgs_to_send = []
+        for msg in retrieved_msgs:
+            msgs_to_send.append({'timestamp': msg.timestamp,
+                                 'author_mail': msg.author_mail,
+                                 'body': msg.body})
+        return msgs_to_send
+
+
 def save_msg(msg, user_id):
     """ save received msg to db """
     content = json.loads(msg)

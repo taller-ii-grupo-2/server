@@ -17,7 +17,7 @@ class Message(db.Model):
                         nullable=True)
 
     # destinatario en caso de msj directo.
-    dm_dest = db.Column(db.Integer, nullable=True)
+    dm_dest_mail = db.Column(db.String(32), nullable=True)
 
     # In general, you will want to work with UTC dates and times in a server
     # application. This ensures that you are using uniform timestamps
@@ -26,19 +26,19 @@ class Message(db.Model):
     # -part-iv-database
     timestamp = db.Column(db.DateTime, index=True,
                           default=datetime.utcnow)
-    author_id = db.Column(db.Integer)
+    author_mail = db.Column(db.String(32))
 
     body = db.Column(db.String(constant.MAX_MSG_BODY_LENGTH), nullable=False)
 #    events_author_id = db.Column(db.Integer, db.ForeignKey('users.id'))
 #    user = relationship("User")
 
     # pylint: disable = R0913
-    def __init__(self, organization, channel, dm_dest, author_id, body):
+    def __init__(self, organization, channel, dm_dest_mail, author_mail, body):
         """ initializes table """
         self.organization = organization
         self.channel = channel
-        self.dm_dest = dm_dest
-        self.author_id = author_id
+        self.dm_dest_mail = dm_dest_mail
+        self.author_mail = author_mail
         self.body = body
 
     def __repr__(self):
@@ -58,14 +58,14 @@ class Message(db.Model):
 
     # pylint: disable = R0913
     @staticmethod
-    def add_message(org, channel, dm_dest, author_id, body):
+    def add_message(org, channel, dm_dest, author_mail, body):
         """ adds msg to table """
         try:
             msg = Message(
                 organization=org,
                 channel=channel,
-                dm_dest=dm_dest,
-                author_id=author_id,
+                dm_dest_mail=dm_dest,
+                author_mail=author_mail,
                 body=body
             )
             db.session.add(msg)  # pylint: disable = E1101
@@ -75,6 +75,21 @@ class Message(db.Model):
         app.logger.info('added msg to db: ' + msg)  # pylint: disable=no-member
         return msg
 
+    @staticmethod
+    def get_channel_messages(orga_name, channel_name):
+        """ retrieve all msgs for given orga/channel"""
+        # pylint: disable = E1101
+        return db.session.query(Message).filter_by(
+            organization=orga_name, channel=channel_name)
+
+    @staticmethod
+    def get_dms(orga_name, dm_dest_mail, asker_mail):
+        """ get all private msgs for given org/users"""
+        # pylint: disable = E1101
+        return db.session.query(Message).filter_by(
+            dm_dest_mail=dm_dest_mail).filter_by(
+                dm_dest_mail=asker_mail).filter_by(
+                    organization=orga_name)
 
 #    @staticmethod
 #    def delete_all():

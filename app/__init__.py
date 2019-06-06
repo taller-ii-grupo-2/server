@@ -47,6 +47,9 @@ api.add_resource(routes.Login, '/login')
 api.add_resource(routes.Logout, '/logout')
 api.add_resource(routes.DeleteUser, '/deleteone')
 api.add_resource(routes.Channels, '/channels')
+api.add_resource(routes.Messages, '/messages/<orga_name>/<channel_name>')
+api.add_resource(routes.PrivateMessages,
+                 '/messages/<orga_name>/dms/<dm_dest_mail>')
 
 
 app.logger.info('in main')
