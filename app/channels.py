@@ -107,5 +107,4 @@ class Channel(db.Model):
     @staticmethod
     def get_users_in_channel(name, org_id):
         """ get users in channel of orga """
-        return Channel.query.filter_by(name=name,
-                                       organization_id=org_id).first().users
+        return Channel.get_channel_with_name(name, org_id).users

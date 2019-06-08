@@ -378,7 +378,7 @@ def save_msg(msg, user_id):
     body = content['body']
     msg = Message.add_message(organization, channel, dm_dest, author_id, body)
 
-    if organization:
+    if channel:
         deliver_msg(body, organization, channel, author_id, msg.timestamp)
     else:
         deliver_dm(body, dm_dest, author_id, msg.timestamp)
@@ -407,13 +407,13 @@ def deliver_msg(msg_body, org_name, channel_name, author_id, timestamp):
                 'organization': org_name,
                 'channel': channel_name,
                 'author_name': author_name,
-                'timestamp': timestamp}
+                'timestamp': str(timestamp)}
 
     users = Channel.get_users_in_channel(channel_name, org_id)
 
     for user in users:
-        if User.is_online(user):
-            sid = User.get_user_by_id(user).sid
+        if User.is_online(user.id):
+            sid = User.get_user_by_id(user.id).sid
             emit('message', msg_dict, room=sid)
 
 

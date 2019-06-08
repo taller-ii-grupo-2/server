@@ -144,6 +144,7 @@ class User(db.Model):
     def is_online(user_id):
         """ say if user is connected via socket """
         # pylint: disable = E1101
+        app.logger.info("is user online? " + str(user_id))
         return bool(db.session.query(User).filter_by(id=user_id).first().sid)
 
     def udpate_sid(self, sid):
