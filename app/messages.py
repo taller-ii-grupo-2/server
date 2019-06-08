@@ -72,7 +72,6 @@ class Message(db.Model):
             db.session.commit()  # pylint: disable = E1101
         except (sql.DataError) as error:
             raise error
-        app.logger.info('added msg to db: ' + msg)  # pylint: disable=no-member
         return msg
 
     @staticmethod
