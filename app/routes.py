@@ -376,7 +376,8 @@ def save_msg(msg, user_id):
     dm_dest = content['dm_dest']
     author_mail = User.get_user_by_id(user_id).mail
     body = content['body']
-    msg = Message.add_message(organization, channel, dm_dest, author_mail, body)
+    msg = Message.add_message(organization,
+                              channel, dm_dest, author_mail, body)
 
     if channel:
         deliver_msg(body, organization, channel, author_mail, msg.timestamp)

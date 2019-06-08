@@ -3,7 +3,7 @@ table. Unlike the Organization model, this is to create one table per oorga.
 """
 from datetime import datetime
 import sqlalchemy.exc as sql
-from app import db, app
+from app import db
 from app import constant
 
 
