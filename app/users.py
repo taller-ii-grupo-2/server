@@ -141,10 +141,12 @@ class User(db.Model):
         return db.session.query(User).filter_by(sid=sid).first()
 
     @staticmethod
-    def is_online(user_id):
+    def is_online(user_mail):
         """ say if user is connected via socket """
         # pylint: disable = E1101
-        return bool(db.session.query(User).filter_by(id=user_id).first().sid)
+        app.logger.info("is user online? " + str(user_mail))
+        return bool(db.session.query(User).
+                    filter_by(mail=user_mail).first().sid)
 
     def udpate_sid(self, sid):
         """ Update user's sid in table """

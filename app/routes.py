@@ -374,46 +374,45 @@ def save_msg(msg, user_id):
     organization = content['organization']
     channel = content['channel']
     dm_dest = content['dm_dest']
-    author_id = user_id
+    author_mail = User.get_user_by_id(user_id).mail
     body = content['body']
-    msg = Message.add_message(organization, channel, dm_dest, author_id, body)
+    msg = Message.add_message(organization,
+                              channel, dm_dest, author_mail, body)
 
-    if organization:
-        deliver_msg(body, organization, channel, author_id, msg.timestamp)
+    if channel:
+        deliver_msg(body, organization, channel, author_mail, msg.timestamp)
     else:
-        deliver_dm(body, dm_dest, author_id, msg.timestamp)
+        deliver_dm(body, dm_dest, author_mail, msg.timestamp)
 
 
-def deliver_dm(msg_body, dm_dest, author_id, timestamp):
+def deliver_dm(msg_body, dm_dest, author_mail, timestamp):
     """ if user is online, the msg gets delivered. """
-    author_name = User.get_user_by_id(author_id).name
 
     msg_dict = {'msg_body': msg_body,
-                'author_name': author_name,
-                'timestamp': timestamp}
+                'author_mail': author_mail,
+                'timestamp': str(timestamp)}
 
     if User.is_online(dm_dest):
-        sid = User.get_user_by_id(dm_dest).sid
+        sid = User.get_user_by_mail(dm_dest).sid
         emit('dm', msg_dict, room=sid)
 
 
-def deliver_msg(msg_body, org_name, channel_name, author_id, timestamp):
+def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp):
     """ deliver msg to connected users. """
 
     org_id = Organization.get_organization_by_name(org_name).id
-    author_name = User.get_user_by_id(author_id).name
 
     msg_dict = {'msg_body': msg_body,
                 'organization': org_name,
                 'channel': channel_name,
-                'author_name': author_name,
-                'timestamp': timestamp}
+                'author_mail': author_mail,
+                'timestamp': str(timestamp)}
 
     users = Channel.get_users_in_channel(channel_name, org_id)
 
     for user in users:
-        if User.is_online(user):
-            sid = User.get_user_by_id(user).sid
+        if User.is_online(user.mail):
+            sid = User.get_user_by_id(user.id).sid
             emit('message', msg_dict, room=sid)
 
 
