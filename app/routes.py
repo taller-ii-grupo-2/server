@@ -16,6 +16,7 @@ from app.exceptions import UserIsAlredyInOrganization
 from app.exceptions import InvalidOrganization
 from app.exceptions import AlreadyCreatedChannel
 from app.exceptions import UserNotInOrganization, InvalidChannelName
+from app.exceptions import InvalidChannel, UserIsAlredyInChannel
 from app.messages import Message
 from app.channels import Channel
 
@@ -330,6 +331,32 @@ class Channels(Resource):
         except(InvalidCookie, AlreadyCreatedChannel,
                UserNotInOrganization, sql.DataError,
                InvalidChannelName) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+class UsersFromChannels(Resource):
+    """ manage users in channels """
+    @classmethod
+    def post(cls):
+        """ add user to channel """
+        content = request.get_json()
+        org_name = content['nameOrga']
+        channel_name = content['channel_name']
+        mail = content['user_mail']
+        session_cookie = request.cookies.get('session')
+        try:
+            User.get_user_with_cookie(session_cookie)
+            orga = Organization.get_organization_by_name(org_name)
+            user = User.get_user_by_mail(mail)
+            orga.add_user_to_channel(user, channel_name)
+            data = {'message': 'user added'}
+            response = jsonify(data)
+            response.status_code = 200
+        except(InvalidCookie, InvalidUser,
+               InvalidOrganization, sql.DataError,
+               InvalidChannel, UserIsAlredyInChannel) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
