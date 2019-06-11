@@ -406,25 +406,11 @@ def save_msg(msg, user_id):
     msg = Message.add_message(organization,
                               channel, dm_dest, author_mail, body)
 
-    if channel:
-        deliver_msg(body, organization, channel, author_mail, msg.timestamp)
-    else:
-        deliver_dm(body, dm_dest, author_mail, msg.timestamp)
+    deliver_msg(body, organization, channel, author_mail, msg.timestamp, 
+                dm_dest)
 
-
-def deliver_dm(msg_body, dm_dest, author_mail, timestamp):
-    """ if user is online, the msg gets delivered. """
-
-    msg_dict = {'msg_body': msg_body,
-                'author_mail': author_mail,
-                'timestamp': str(timestamp)}
-
-    if User.is_online(dm_dest):
-        sid = User.get_user_by_mail(dm_dest).sid
-        emit('dm', msg_dict, room=sid)
-
-
-def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp):
+def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
+                dm_dest):
     """ deliver msg to connected users. """
 
     org_id = Organization.get_organization_by_name(org_name).id
@@ -432,14 +418,21 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp):
     msg_dict = {'msg_body': msg_body,
                 'organization': org_name,
                 'channel': channel_name,
+                'dm_dest': dm_dest,
                 'author_mail': author_mail,
                 'timestamp': str(timestamp)}
 
-    users = Channel.get_users_in_channel(channel_name, org_id)
-
-    for user in users:
-        if User.is_online(user.mail):
-            sid = User.get_user_by_id(user.id).sid
+    if channel_name:
+        users = Channel.get_users_in_channel(channel_name, org_id)
+        for user in users:
+            if User.is_online(user.mail):
+                sid = User.get_user_by_id(user.id).sid
+                emit('message', msg_dict, room=sid)
+    else:
+        app.logger.info('sending dm')
+        if User.is_online(dm_dest):
+            sid = User.get_user_by_mail(dm_dest).sid
+            app.logger.info('emitting dm...')
             emit('message', msg_dict, room=sid)
 
 
@@ -480,4 +473,4 @@ def disconnect_socket_user():
     sid = request.sid
     user = User.get_user_by_sid(sid)  # pylint: disable=no-member
     app.logger.info('user disconnected: ' + sid + ", " + user.mail)
-    user.udpate_sid(' ')
+    user.udpate_sid("")
