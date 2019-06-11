@@ -406,9 +406,11 @@ def save_msg(msg, user_id):
     msg = Message.add_message(organization,
                               channel, dm_dest, author_mail, body)
 
-    deliver_msg(body, organization, channel, author_mail, msg.timestamp, 
+    deliver_msg(body, organization, channel, author_mail, msg.timestamp,
                 dm_dest)
 
+
+# pylint: disable=R0913
 def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 dm_dest):
     """ deliver msg to connected users. """
@@ -429,11 +431,11 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 sid = User.get_user_by_id(user.id).sid
                 emit('message', msg_dict, room=sid)
     else:
-        app.logger.info('sending dm')
         if User.is_online(dm_dest):
             sid = User.get_user_by_mail(dm_dest).sid
-            app.logger.info('emitting dm...')
             emit('message', msg_dict, room=sid)
+
+# pylint: enable=too-many-arguments
 
 
 @socketio.on('message')
