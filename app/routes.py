@@ -372,8 +372,8 @@ class Messages(Resource):
         retrieved_msgs = Message.get_channel_messages(orga_name, channel_name)
         msgs_to_send = []
         for msg in retrieved_msgs:
-            author_mail = User.get_user_by_id(msg.author_id).mail
-            msgs_to_send.append({'timestamp': msg.timestamp,
+            author_mail = msg.author_mail
+            msgs_to_send.append({'timestamp': str(msg.timestamp),
                                  'author_mail': author_mail,
                                  'body': msg.body})
         return msgs_to_send
@@ -390,7 +390,7 @@ class PrivateMessages(Resource):
         retrieved_msgs = Message.get_dms(orga_name, dm_dest_mail, asker_mail)
         msgs_to_send = []
         for msg in retrieved_msgs:
-            msgs_to_send.append({'timestamp': msg.timestamp,
+            msgs_to_send.append({'timestamp': str(msg.timestamp),
                                  'author_mail': msg.author_mail,
                                  'body': msg.body})
         return msgs_to_send
