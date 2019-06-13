@@ -38,6 +38,7 @@ api.add_resource(routes.OrganizationMembersLocations,
                  '/organizations/<org_name>/members/locations')
 api.add_resource(routes.Organizations, '/organizations')
 api.add_resource(routes.UserOrganizations, '/user/organizations')
+api.add_resource(routes.AdminLogin, '/adminlogin')
 api.add_resource(routes.UserOrganizationsChannels,
                  '/user/organizations/<org_name>/channels')
 # api.add_resource(routes.ShowOrganization, '/myorganizations')

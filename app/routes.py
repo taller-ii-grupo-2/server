@@ -17,6 +17,8 @@ from app.exceptions import InvalidOrganization
 from app.exceptions import AlreadyCreatedChannel
 from app.exceptions import UserNotInOrganization, InvalidChannelName
 from app.exceptions import InvalidChannel, UserIsAlredyInChannel
+from app.exceptions import NotAdminWeb
+from app.admins import Admin
 from app.messages import Message
 from app.channels import Channel
 
@@ -392,6 +394,24 @@ class PrivateMessages(Resource):
                                  'author_mail': msg.author_mail,
                                  'body': msg.body})
         return msgs_to_send
+
+
+class AdminLogin(Resource):
+    """ manage login from admin webs """
+    @classmethod
+    def post(cls):
+        """ login admins """
+        content = request.get_json()
+        mail = content['email']
+        password = content['password']
+        try:
+            Admin.check_if_admin(mail, password)
+            response = jsonify()
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
 
 
 def save_msg(msg, user_id):
