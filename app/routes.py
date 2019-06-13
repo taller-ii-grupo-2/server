@@ -411,6 +411,7 @@ class AdminLogin(Resource):
         except NotAdminWeb as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
 
