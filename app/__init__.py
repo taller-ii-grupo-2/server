@@ -7,7 +7,7 @@ from flask_socketio import SocketIO
 import logging
 import time
 import firebase_admin
-from firebase_admin import credentials
+from firebase_admin import credentials, messaging
 
 cred = credentials.Certificate('hypechatapp.json')
 default_app = firebase_admin.initialize_app(cred)
@@ -55,3 +55,18 @@ api.add_resource(routes.PrivateMessages,
 
 
 app.logger.info('in main')
+# messaging.AndroidNotification(title="title notif", body="notif body")
+# This registration token comes from the client FCM SDKs.
+registration_token = "dtDcV2El9wo:APA91bEYGVw2onreMsqlKOoowctQWD3VMVrrVgUzwNSYZSnt_BjQ0rf-Cr5NXakKpkfAMLpzQcd8VamgVS5wlvlA73bGnD74bcg4B936Nhcme1kx7kHN-uhad_RtrljvH0AovIHEhw4G"
+
+# See documentation on defining a message payload.
+message = messaging.Message(
+        notification = messaging.Notification(title='title', body='body'),
+        token=registration_token,)
+
+# Send a message to the device corresponding to the provided
+# registration token.
+response = messaging.send(message)
+# Response is a message ID string.
+print('Successfully sent message:', response)
+
