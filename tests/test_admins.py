@@ -8,5 +8,5 @@ def test_check_if_admin_incorrect():
 		Admin.check_if_admin('payas','payaslianadas')
 
 def test_check_if_admin_correct():
-	n = Admin.check_if_admin('payas','payaslian')
-	assert n == 1
+	admin = Admin.check_if_admin('payas','payaslian')
+	assert admin.name == 'payas'

@@ -4,6 +4,7 @@ from flask import request, jsonify
 from flask_restful import Resource
 from flask_socketio import emit
 import sqlalchemy.exc as sql
+from flask_jwt_extended import jwt_required
 from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
@@ -405,12 +406,26 @@ class AdminLogin(Resource):
         mail = content['email']
         password = content['password']
         try:
-            Admin.check_if_admin(mail, password)
-            response = jsonify()
+            admin = Admin.check_if_admin(mail, password)
+            token = admin.create_token()
+            response = jsonify({'token': token})
             response.status_code = 200
         except NotAdminWeb as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+
+class AdminSeeUsers(Resource):
+    """ manage login from admin webs """
+    @classmethod
+    @jwt_required
+    def get(cls):
+        """ login admins """
+        count = User.amount()
+        response = jsonify({'count': count})
+        response.status_code = 200
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 

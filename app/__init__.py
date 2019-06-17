@@ -8,12 +8,16 @@ import logging
 import time
 import firebase_admin
 from firebase_admin import credentials
+from flask_jwt_extended import JWTManager
+
 
 cred = credentials.Certificate('hypechatapp.json')
 default_app = firebase_admin.initialize_app(cred)
 
 app = Flask(__name__)
 app.config.from_object(Config)
+app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
+jwt = JWTManager(app)
 db = SQLAlchemy(app)
 api = Api(app)
 socketio = SocketIO(app)
@@ -52,6 +56,6 @@ api.add_resource(routes.UsersFromChannels, '/channels/users')
 api.add_resource(routes.Messages, '/messages/<orga_name>/<channel_name>')
 api.add_resource(routes.PrivateMessages,
                  '/messages/<orga_name>/dms/<dm_dest_mail>')
-
+api.add_resource(routes.AdminSeeUsers, '/users/total')
 
 app.logger.info('in main')

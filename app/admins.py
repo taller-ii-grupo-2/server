@@ -1,5 +1,6 @@
 """ admin model """
 import json
+from flask_jwt_extended import create_access_token
 from app.exceptions import NotAdminWeb
 
 
@@ -10,6 +11,10 @@ FILE_URL = "./admins.json"
 class Admin():
     """docstring for Admin"""
 
+    def __init__(self, name, password):
+        self.name = name
+        self.password = password
+
     @staticmethod
     def check_if_admin(name, password):
         """ checks if user is admin web"""
@@ -18,6 +23,11 @@ class Admin():
 
         for user in data['users']:
             if user['name'] == name and user['password'] == password:
-                return 1
+                admin = Admin(name, password)
+                return admin
 
         raise NotAdminWeb
+
+    def create_token(self):
+        """ create jwt token"""
+        return create_access_token(identity=(self.name, self.password))

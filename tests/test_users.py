@@ -80,3 +80,11 @@ def test_user_add_admin_to_organization_without_being_admin(mocker):
 	with pytest.raises(UserIsNotCreator):
 		user2.make_admin_user(user3,orga)
 
+def test_total_amount_of_users(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user = User.add_user('agustin','payas17@hotmail.com','payas17@hotmail.com','payas17@hotmail.com',3.14,3.14,'payas17@hotmail.com')
+	count = User.amount()
+	assert count == 2
+

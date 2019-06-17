@@ -195,3 +195,9 @@ class User(db.Model):
         self.url = url
         db.session.commit()  # pylint: disable = E1101
         FbUser.change_user(self.mail, username, url)
+
+    @staticmethod
+    def amount():
+        """ get total amount of users """
+        # pylint: disable = E1101
+        return db.session.query(User).count()
