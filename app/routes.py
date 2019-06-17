@@ -5,6 +5,7 @@ from flask_restful import Resource
 from flask_socketio import emit
 import sqlalchemy.exc as sql
 from flask_jwt_extended import jwt_required
+from firebase_admin import messaging
 from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
@@ -463,15 +464,28 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
     if channel_name:
         users = Channel.get_users_in_channel(channel_name, org_id)
         for user in users:
+            notify_user(user.mail.replace("@", "~at~"),
+                        org_name + " - " + channel_name,
+                        msg_body)
             if User.is_online(user.mail):
                 sid = User.get_user_by_id(user.id).sid
                 emit('message', msg_dict, room=sid)
     else:
+        notify_user(dm_dest.replace("@", "~at~"),
+                    "Message from " + author_mail,
+                    msg_body)
         if User.is_online(dm_dest):
             sid = User.get_user_by_mail(dm_dest).sid
             emit('message', msg_dict, room=sid)
 
+
 # pylint: enable=too-many-arguments
+def notify_user(topic, title, body):
+    """send notification to user with given info"""
+    message = messaging.Message(
+        notification=messaging.Notification(title=title, body=body),
+        topic=topic)
+    messaging.send(message)
 
 
 @socketio.on('message')
