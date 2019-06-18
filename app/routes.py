@@ -461,6 +461,8 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 'author_mail': author_mail,
                 'timestamp': str(timestamp)}
 
+    process_mentions(msg_body, org_name, channel_name)
+
     if channel_name:
         users = Channel.get_users_in_channel(channel_name, org_id)
         for user in users:
@@ -486,6 +488,24 @@ def notify_user(topic, title, body):
         notification=messaging.Notification(title=title, body=body),
         topic=topic)
     messaging.send(message)
+
+
+def process_mentions(msg_body, orga_name, channel_name):
+    for word in msg_body.split():
+        if word.startswith("@"):
+            if is_user_mention(word):
+                process_user_mention(word, orga_name, channel_name)
+
+def is_user_mention(word):
+    """ check if the mention is mentioning a user email address """
+    return "@" in word[1:]
+
+
+def process_user_mention(word, orga_name, channel_name):
+    topic = word[1:]
+    title = "New mention in chat!"
+    body = "You've been mentioned in " + orga_name + ", " + channel_name
+    notify_user(topic, title, body)
 
 
 @socketio.on('message')
