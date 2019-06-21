@@ -219,3 +219,41 @@ class Organization(db.Model):
             'name': self.name,
             'channels': channels
         }
+
+    @staticmethod
+    def delete_organization(org_name):
+        """ delete organization from db """
+        orga = Organization.get_organization_by_name(org_name)
+        for channel in orga.channels:
+            Channel.delete_channel(channel.name, orga.id)
+
+        Organization.query.filter_by(name=orga.name).delete()
+
+    def remove_user(self, user):
+        """ removes user from orga """
+        for channel in self.channels:
+            if user in channel.users:
+                channel.remove_user(user)
+
+        self.users.remove(user)
+        db.session.commit()  # pylint: disable = E1101
+
+    def get_role_of_user(self, user):
+        """ get role of user in organization """
+        if user.id == self.creator_user_id:
+            return "Creator"
+
+        if user in self.admins:
+            return "Admin"
+
+        return "Member"
+
+    def get_users_roles(self):
+        """ get all users with roles """
+        users = []
+        for user in self.users:
+            users.append({
+                'mail': user.mail,
+                'type': self.get_role_of_user(user)
+                })
+        return users

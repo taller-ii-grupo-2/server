@@ -19,7 +19,7 @@ from app.exceptions import InvalidOrganization
 from app.exceptions import AlreadyCreatedChannel
 from app.exceptions import UserNotInOrganization, InvalidChannelName
 from app.exceptions import InvalidChannel, UserIsAlredyInChannel
-from app.exceptions import NotAdminWeb
+from app.exceptions import NotAdminWeb, UserIsCreator, UserIsNotAdmin
 from app.admins import Admin
 from app.messages import Message
 from app.channels import Channel
@@ -203,6 +203,85 @@ class Organizations(Resource):
             response.status_code = 500
         return response
 
+    @classmethod
+    def delete(cls):
+        """ delete member from orga"""
+        content = request.get_json()
+        org_name = content['nameOrga']
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            user.delete_orga(org_name)
+            data = {'message': 'orga deleted'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except InvalidCookie as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+class OrganizationUsersRoles(Resource):
+    """ manage type of users in orga """
+    @classmethod
+    def get(cls, name_orga):
+        """ get all users with types """
+        session_cookie = request.cookies.get('session')
+        try:
+            User.get_user_with_cookie(session_cookie)
+            orga = Organization.get_organization_by_name(name_orga)
+            response = jsonify(orga.get_users_roles())
+            response.status_code = 200
+        except InvalidCookie as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+class OrganizationChannels(Resource):
+    """ manage channels of organizations """
+    @classmethod
+    def delete(cls):
+        """ delete member from orga"""
+        content = request.get_json()
+        org_name = content['nameOrga']
+        name_channel = content['name_channel']
+        session_cookie = request.cookies.get('session')
+        try:
+            User.get_user_with_cookie(session_cookie)
+            Channel.delete_channel(org_name, name_channel)
+            data = {'message': 'channel deleted'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except InvalidCookie as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
+# class OrganizationsAdmins(Resource):
+#     """ manage admins of organizations """
+#     @classmethod
+#     def put(cls):
+#         """ update role of the user in orga """
+#         content = request.get_json()
+#         mail = content['mail']
+#         tipo = content['type']
+#         session_cookie = request.cookies.get('session')
+#         try:
+#             user = User.get_user_with_cookie(session_cookie)
+#             user_to_update = User.get_user_by_mail(mail)
+#             channel = Channel.delete_channel(org_name, name_channel)
+#             data = {'message': 'user deleted'}
+
+#             response = jsonify(data)
+#             response.status_code = 200
+#         except InvalidCookie as error:
+#             response = jsonify({'message': error.message})
+#             response.status_code = error.code
+#         return response
 
 class UserOrganizations(Resource):
     """ orrganization from users"""
@@ -254,6 +333,28 @@ class OrganizationMembers(Resource):
             response.status_code = 200
         except(UserIsAlredyInOrganization, InvalidOrganization,
                InvalidCookie, InvalidUser) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    def delete(cls):
+        """ delete member from orga"""
+        content = request.get_json()
+        org_name = content['nameOrga']
+        mail = content['mail']
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            user_to_remove = User.get_user_by_mail(mail)
+            orga = Organization.get_organization_by_name(org_name)
+            user.remove_user_from_orga(orga, user_to_remove)
+            data = {'message': 'user deleted'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except(UserIsCreator, UserIsNotAdmin,
+               InvalidCookie) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
