@@ -3,9 +3,10 @@ import re
 from sqlalchemy.orm import validates
 from app.fb_user import FbUser
 from app import db, app
+from app.organizations import Organization
 from app.exceptions import InvalidMail, SignedMail
-from app.exceptions import InvalidUser
-from app.exceptions import UserIsNotCreator
+from app.exceptions import InvalidUser, UserIsNotAdmin
+from app.exceptions import UserIsNotCreator, UserIsCreator
 from app.associations import ORGS
 
 
@@ -201,3 +202,23 @@ class User(db.Model):
         """ get total amount of users """
         # pylint: disable = E1101
         return db.session.query(User).count()
+
+    def remove_user_from_orga(self, orga, user):
+        """ remove user form organization """
+
+        if user.id == orga.creator_user_id:
+            raise UserIsCreator
+
+        if self not in orga.admins:
+            raise UserIsNotAdmin
+
+        orga.remove_user(user)
+
+    def delete_orga(self, orga_name):
+        """ remove organization """
+        for orga in self.organizations:
+            if orga.name == orga_name and self.id == orga.creator_user_id:
+                Organization.delete_organization(orga_name)
+                return
+
+        raise UserIsNotCreator
