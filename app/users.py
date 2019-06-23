@@ -219,8 +219,8 @@ class User(db.Model):
         for orga in self.organizations:
             if orga.name == orga_name and self.id == orga.creator_user_id:
                 self.organizations.remove(orga)
-                Organization.delete_organization(orga_name)
                 db.session.commit()  # pylint: disable = E1101
+                Organization.delete_organization(orga_name)
                 return
 
         raise UserIsNotCreator

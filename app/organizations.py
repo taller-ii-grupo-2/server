@@ -14,7 +14,7 @@ from app.associations import ADMINS
 from app.channels import Channel
 from app import constant
 
-
+# pylint: disable = R0904
 class Organization(db.Model):
     """ name table structure """
     __tablename__ = 'organizations'
@@ -224,12 +224,28 @@ class Organization(db.Model):
     def delete_organization(org_name):
         """ delete organization from db """
         orga = Organization.get_organization_by_name(org_name)
-        for channel in orga.channels:
-            Channel.delete_channel(channel.name, orga.id)
-            orga.channels.remove(channel)
-
-        db.session.commit()  # pylint: disable = E1101
+        orga.remove_all_admins()
+        orga.delete_all_channels()
         Organization.query.filter_by(name=orga.name).delete()
+
+    def delete_all_channels(self):
+        """ delete all channels """
+        for channel in self.channels:
+            self.delete_channel(channel)
+
+    def delete_channel(self, channel):
+        """ delete channel in orga"""
+        Channel.delete_channel(channel.name, self.id)
+
+    def remove_admin(self, admin):
+        """ removes admins from orga """
+        self.admins.remove(admin)
+        db.session.commit()  # pylint: disable = E1101
+
+    def remove_all_admins(self):
+        """ removes all admins """
+        for admin in self.admins:
+            self.remove_admin(admin)
 
     def remove_user(self, user):
         """ removes user from orga """
