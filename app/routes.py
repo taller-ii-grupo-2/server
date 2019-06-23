@@ -16,7 +16,7 @@ from app.exceptions import InvalidToken, UserNotRegistered
 from app.exceptions import InvalidCookie, InvalidUser
 from app.exceptions import UserIsAlredyInOrganization
 from app.exceptions import InvalidOrganization
-from app.exceptions import AlreadyCreatedChannel
+from app.exceptions import AlreadyCreatedChannel, UserIsNotCreator
 from app.exceptions import UserNotInOrganization, InvalidChannelName
 from app.exceptions import InvalidChannel, UserIsAlredyInChannel
 from app.exceptions import NotAdminWeb, UserIsCreator, UserIsNotAdmin
@@ -205,7 +205,7 @@ class Organizations(Resource):
 
     @classmethod
     def delete(cls):
-        """ delete member from orga"""
+        """ delete orga"""
         content = request.get_json()
         org_name = content['nameOrga']
         session_cookie = request.cookies.get('session')
@@ -216,7 +216,7 @@ class Organizations(Resource):
 
             response = jsonify(data)
             response.status_code = 200
-        except InvalidCookie as error:
+        except (InvalidCookie, UserIsNotCreator) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
@@ -243,14 +243,15 @@ class OrganizationChannels(Resource):
     """ manage channels of organizations """
     @classmethod
     def delete(cls):
-        """ delete member from orga"""
+        """ delete channel from orga"""
         content = request.get_json()
         org_name = content['nameOrga']
         name_channel = content['name_channel']
         session_cookie = request.cookies.get('session')
         try:
             User.get_user_with_cookie(session_cookie)
-            Channel.delete_channel(org_name, name_channel)
+            orga = Organization.get_organization_by_name(org_name)
+            Channel.delete_channel(name_channel, orga.id)
             data = {'message': 'channel deleted'}
 
             response = jsonify(data)

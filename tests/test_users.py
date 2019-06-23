@@ -131,4 +131,4 @@ def test_delete_orga_being_creator(mocker):
                                      'desc','welcome_message')
 
 	user.delete_orga('org_name')
-	assert len(user.organizations) == 1
+	assert len(user.organizations) == 0
