@@ -226,7 +226,9 @@ class Organization(db.Model):
         orga = Organization.get_organization_by_name(org_name)
         for channel in orga.channels:
             Channel.delete_channel(channel.name, orga.id)
+            orga.channels.remove(channel)
 
+        db.session.commit()  # pylint: disable = E1101
         Organization.query.filter_by(name=orga.name).delete()
 
     def remove_user(self, user):

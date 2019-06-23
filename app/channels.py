@@ -112,6 +112,9 @@ class Channel(db.Model):
     @staticmethod
     def delete_channel(name, org_id):
         """ delete channel """
+        channel = Channel.get_channel_with_name(name, org_id)
+        for user in channel.users:
+            channel.users.remove(user)
         Channel.query.filter_by(name=name,
                                 organization_id=org_id).delete()
 
