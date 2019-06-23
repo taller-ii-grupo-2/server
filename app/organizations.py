@@ -14,6 +14,7 @@ from app.associations import ADMINS
 from app.channels import Channel
 from app import constant
 
+
 # pylint: disable = R0904
 class Organization(db.Model):
     """ name table structure """
