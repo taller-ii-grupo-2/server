@@ -113,8 +113,8 @@ class Channel(db.Model):
     def delete_channel(name, org_id):
         """ delete channel """
         channel = Channel.get_channel_with_name(name, org_id)
-        for user in channel.users:
-            channel.remove_user(user)
+        channel.users.clear()
+        db.session.commit()  # pylint: disable = E1101
 
         Channel.query.filter_by(name=name,
                                 organization_id=org_id).delete()

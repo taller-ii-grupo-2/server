@@ -49,3 +49,19 @@ USRS = db.Table(
         primary_key=True
         )
     )
+
+INVS = db.Table(
+    'Invites',
+    db.Column(
+        'user_id',
+        db.Integer,
+        db.ForeignKey('users.id'),
+        primary_key=True
+        ),
+    db.Column(
+        'organization_id',
+        db.Integer,
+        db.ForeignKey('organizations.id'),
+        primary_key=True
+        )
+    )

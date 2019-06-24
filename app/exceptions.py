@@ -169,3 +169,19 @@ class UserIsCreator(Exception):
         super().__init__()
         self.message = 'That user is the creator of the organization'
         self.code = BAD_REQUEST
+
+
+class UserIsAlreadyInvited(Exception):
+    """ Is raised when try to erase the creator of the organization"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is already invited to the organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsNotInvited(Exception):
+    """ Is raised when try to erase the creator of the organization"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is not invited to the organization'
+        self.code = BAD_REQUEST

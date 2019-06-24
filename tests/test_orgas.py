@@ -106,6 +106,7 @@ def test_add_user(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	assert len(orga.users) == 2
 
@@ -137,6 +138,7 @@ def test_get_user_in_private_channel(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	channel = orga.create_channel('asd',True,user2,'sad','asd')
 	assert len(channel.users) == 1
@@ -149,6 +151,7 @@ def test_get_users_per_channel(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	channel = orga.create_channel('asd',True,user2,'sad','asd')
 	assert len(orga.get_channels_with_user(user.id)) == 2
@@ -164,6 +167,7 @@ def test_create_channel_then_add_user(mocker):
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
 	channel = orga.create_channel('asd',False,user,'sad','asd')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	assert len(orga.get_channels_with_user(user.id)) == 3
 	assert len(orga.get_channels_with_user(user2.id)) == 3
@@ -177,6 +181,7 @@ def test_create_private_channel_then_add_user(mocker):
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
 	channel = orga.create_channel('asd',True,user,'sad','asd')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	assert len(orga.get_channels_with_user(user.id)) == 3
 	assert len(orga.get_channels_with_user(user2.id)) == 2
@@ -189,6 +194,7 @@ def test_add_users_per_channel(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	channel = orga.create_channel('asd',True,user2,'sad','asd')
 	orga.add_user_to_channel(user,channel.name)
@@ -304,6 +310,7 @@ def test_get_role_if_admin(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user_admin(user2)
 	assert orga.get_role_of_user(user2) == 'Admin'
 
@@ -316,5 +323,28 @@ def test_get_role_if_member(mocker):
 	org_name = "Exxon mobile"
 	orga = Organization.create(org_name, 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	assert orga.get_role_of_user(user2) == 'Member'
+
+
+def test_add_forbidden_word(mocker):
+	org_name = "Exxon mobile"
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create(org_name, 'www.asd.com',user,
+                                     'desc','welcome_message')
+	orga.add_invalid_word("user2, user")
+	assert len(orga.words) == 1
+
+def test_add_remove_word(mocker):
+	org_name = "Exxon mobile"
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create(org_name, 'www.asd.com',user,
+                                     'desc','welcome_message')
+	orga.add_invalid_word("user")
+	orga.delete_invalid_word("user")
+	assert len(orga.words) == 0

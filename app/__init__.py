@@ -39,10 +39,10 @@ api.add_resource(routes.AllUsers, '/users/all')
 
 api.add_resource(routes.OrganizationMembers, '/organizations/members')
 api.add_resource(routes.OrganizationChannels, '/organizations/channels')
+api.add_resource(routes.Profile, '/profile/<name>')
 api.add_resource(routes.OrganizationMembersLocations,
                  '/organizations/<org_name>/members/locations')
 api.add_resource(routes.Organizations, '/organizations')
-# api.add_resource(routes.OrganizationsAdmins, '/organizations/admins')
 api.add_resource(routes.OrganizationUsersRoles, '/type/<name_orga>')
 api.add_resource(routes.UserOrganizations, '/user/organizations')
 api.add_resource(routes.AdminLogin, '/adminlogin')
@@ -60,5 +60,6 @@ api.add_resource(routes.Messages, '/messages/<orga_name>/<channel_name>')
 api.add_resource(routes.PrivateMessages,
                  '/messages/<orga_name>/dms/<dm_dest_mail>')
 api.add_resource(routes.AdminSeeUsers, '/users/total')
+api.add_resource(routes.InvalidWords, '/organizations/invalidwords')
 
 app.logger.info('in main')
