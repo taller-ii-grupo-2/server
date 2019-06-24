@@ -63,6 +63,7 @@ def test_user_add_admin_to_organization(mocker):
 	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	user.make_admin_user(user2,orga)
 	assert len(orga.admins) == 2
@@ -75,7 +76,9 @@ def test_user_add_admin_to_organization_without_being_admin(mocker):
 	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
+	orga.invite_user(user3, user)
 	orga.add_user(user3)
 	with pytest.raises(UserIsNotCreator):
 		user2.make_admin_user(user3,orga)
@@ -105,7 +108,9 @@ def test_delete_without_being_admin(mocker):
 	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
+	orga.invite_user(user3, user)
 	orga.add_user(user3)
 	with pytest.raises(UserIsNotAdmin):
 		user2.remove_user_from_orga(orga,user3)
@@ -118,6 +123,7 @@ def test_delete_orga_without_being_creator(mocker):
 	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	with pytest.raises(UserIsNotCreator):
 		user2.delete_orga('org_name')

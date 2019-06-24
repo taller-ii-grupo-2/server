@@ -95,12 +95,16 @@ class Users(Resource):
             response.status_code = error.code
         return response
 
+
+class Profile(Resource):
+    """ manage users profiles """
     @classmethod
-    def get(cls):
-        """post method"""
+    def get(cls, mail):
+        """ get users profiles"""
         session_cookie = request.cookies.get('session')
         try:
-            user = User.get_user_with_cookie(session_cookie)
+            User.get_user_with_cookie(session_cookie)
+            user = User.get_user_by_mail(mail)
             response = jsonify(user.serialize())
             response.status_code = 200
         except InvalidCookie as error:
@@ -238,6 +242,27 @@ class OrganizationUsersRoles(Resource):
             response.status_code = error.code
         return response
 
+    @classmethod
+    def put(cls, name_orga):
+        """ update role of the user in orga """
+        content = request.get_json()
+        mail = content['mail']
+        role = content['type']
+        session_cookie = request.cookies.get('session')
+        try:
+            user = User.get_user_with_cookie(session_cookie)
+            user_to_update = User.get_user_by_mail(mail)
+            orga = Organization.get_organization_by_name(name_orga)
+            orga.update_user(user, user_to_update, role)
+            data = {'message': 'user updated'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except InvalidCookie as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
 
 class OrganizationChannels(Resource):
     """ manage channels of organizations """
@@ -261,28 +286,6 @@ class OrganizationChannels(Resource):
             response.status_code = error.code
         return response
 
-
-# class OrganizationsAdmins(Resource):
-#     """ manage admins of organizations """
-#     @classmethod
-#     def put(cls):
-#         """ update role of the user in orga """
-#         content = request.get_json()
-#         mail = content['mail']
-#         tipo = content['type']
-#         session_cookie = request.cookies.get('session')
-#         try:
-#             user = User.get_user_with_cookie(session_cookie)
-#             user_to_update = User.get_user_by_mail(mail)
-#             channel = Channel.delete_channel(org_name, name_channel)
-#             data = {'message': 'user deleted'}
-
-#             response = jsonify(data)
-#             response.status_code = 200
-#         except InvalidCookie as error:
-#             response = jsonify({'message': error.message})
-#             response.status_code = error.code
-#         return response
 
 class UserOrganizations(Resource):
     """ orrganization from users"""
@@ -316,15 +319,36 @@ class UserOrganizations(Resource):
 class OrganizationMembers(Resource):
     """ organization's members """
     @classmethod
-    def put(cls):
-        """add new member"""
+    def post(cls):
+        """invite new member"""
         content = request.get_json()
         org_name = content['org_name']
         mail_of_user_to_add = content['mail_of_user_to_add']
         session_cookie = request.cookies.get('session')
         try:
-            User.get_user_with_cookie(session_cookie)
+            user_inviting = User.get_user_with_cookie(session_cookie)
             user_to_add = User.get_user_by_mail(mail_of_user_to_add)
+            orga = Organization.get_organization_by_name(org_name)
+            orga.invite_user(user_to_add, user_inviting)
+
+            data = {'message': 'user invited'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except(UserIsAlredyInOrganization, InvalidOrganization,
+               InvalidCookie, InvalidUser) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    def put(cls):
+        """add new member"""
+        content = request.get_json()
+        org_name = content['org_name']
+        session_cookie = request.cookies.get('session')
+        try:
+            user_to_add = User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
             orga.add_user(user_to_add)
 
@@ -529,6 +553,26 @@ class AdminSeeUsers(Resource):
         count = User.amount()
         response = jsonify({'count': count})
         response.status_code = 200
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+
+class InvalidWords(Resource):
+    """manage invalid words """
+    @classmethod
+    def post(cls):
+        """ adds invalid word to orga """
+        content = request.get_json()
+        word = content['word']
+        org_name = content['org_name']
+        try:
+            orga = Organization.get_organization_by_name(org_name)
+            orga.add_invalid_word(word)
+            response = jsonify({'message': 'word added'})
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
         response.headers['Access-Control-Allow-Origin'] = '*'
         return response
 
