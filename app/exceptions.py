@@ -143,7 +143,7 @@ class UserIsNotAdmin(Exception):
     """ Is raised when you enter a email that was already in the db"""
     def __init__(self):
         super().__init__()
-        self.message = 'That user not an admin of the organization'
+        self.message = 'You are not an admin of the organization'
         self.code = BAD_REQUEST
 
 
@@ -160,4 +160,28 @@ class NotAdminWeb(Exception):
     def __init__(self):
         super().__init__()
         self.message = 'You are not a web admin'
+        self.code = BAD_REQUEST
+
+
+class UserIsCreator(Exception):
+    """ Is raised when try to erase the creator of the organization"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is the creator of the organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsAlreadyInvited(Exception):
+    """ Is raised when try to erase the creator of the organization"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is already invited to the organization'
+        self.code = BAD_REQUEST
+
+
+class UserIsNotInvited(Exception):
+    """ Is raised when try to erase the creator of the organization"""
+    def __init__(self):
+        super().__init__()
+        self.message = 'That user is not invited to the organization'
         self.code = BAD_REQUEST

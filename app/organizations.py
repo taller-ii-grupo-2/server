@@ -9,12 +9,15 @@ from app import db
 from app.exceptions import InvalidOrganizationName, AlreadyCreatedChannel
 from app.exceptions import SignedOrganization, InvalidOrganization
 from app.exceptions import UserIsAlredyInOrganization, UserNotInOrganization
-from app.exceptions import InvalidChannel, UserIsAlreadyAdmin
-from app.associations import ADMINS
+from app.exceptions import InvalidChannel, UserIsAlreadyAdmin, UserIsNotAdmin
+from app.exceptions import UserIsAlreadyInvited, UserIsNotInvited
+from app.associations import ADMINS, INVS
 from app.channels import Channel
+from app.words import Word
 from app import constant
 
 
+# pylint: disable = R0904
 class Organization(db.Model):
     """ name table structure """
     __tablename__ = 'organizations'
@@ -33,6 +36,11 @@ class Organization(db.Model):
                                    default=datetime.utcnow)
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     channels = db.relationship('Channel', backref='organization', lazy=True)
+    words = db.relationship('Word', backref='organization', lazy=True)
+    invitations = db.relationship(
+        'User',
+        secondary=INVS,
+        backref=db.backref('invites', lazy='subquery'))
     admins = db.relationship(
         'User',
         secondary=ADMINS,
@@ -170,6 +178,13 @@ class Organization(db.Model):
         """ adds user to organization """
         if new_user in self.users:
             raise UserIsAlredyInOrganization
+
+        if new_user.id != self.creator_user_id:
+            if new_user not in self.invitations:
+                raise UserIsNotInvited
+
+            self.invitations.remove(new_user)
+
         self.users.append(new_user)
         db.session.commit()  # pylint: disable = E1101
         for channel in self.channels:
@@ -219,3 +234,98 @@ class Organization(db.Model):
             'name': self.name,
             'channels': channels
         }
+
+    @staticmethod
+    def delete_organization(org_name):
+        """ delete organization from db """
+        orga = Organization.get_organization_by_name(org_name)
+        orga.delete_all_channels()
+        orga.delete_all_invalid_words()
+        orga.admins.clear()
+        orga.users.clear()
+        db.session.commit()  # pylint: disable = E1101
+        Organization.query.filter_by(name=orga.name).delete()
+
+    def delete_all_channels(self):
+        """ delete all channels """
+        for channel in self.channels:
+            self.delete_channel(channel)
+
+    def delete_channel(self, channel):
+        """ delete channel in orga"""
+        Channel.delete_channel(channel.name, self.id)
+
+    def remove_invitation(self, user):
+        """ remove user invitated to orga """
+        self.invitations.remove(user)
+        db.session.commit()  # pylint: disable = E1101
+
+    def remove_admin(self, admin):
+        """ removes admins from orga """
+        self.admins.remove(admin)
+        db.session.commit()  # pylint: disable = E1101
+
+    def remove_user(self, user):
+        """ removes user from orga """
+        for channel in self.channels:
+            if user in channel.users:
+                channel.remove_user(user)
+
+        self.users.remove(user)
+        db.session.commit()  # pylint: disable = E1101
+
+    def get_role_of_user(self, user):
+        """ get role of user in organization """
+        if user.id == self.creator_user_id:
+            return "Creator"
+
+        if user in self.admins:
+            return "Admin"
+
+        return "Member"
+
+    def get_users_roles(self):
+        """ get all users with roles """
+        users = []
+        for user in self.users:
+            users.append({
+                'mail': user.mail,
+                'type': self.get_role_of_user(user)
+                })
+        return users
+
+    def update_user(self, user_updating, user_to_update, role):
+        """ update role of the user """
+        if role == 'Admin' and user_updating.id == self.admins:
+            self.add_admin(user_to_update)
+        elif role == "Member" and user_updating.id in self.admins:
+            self.remove_admin(user_to_update)
+        else:
+            raise UserIsNotAdmin
+
+    def invite_user(self, user_to_add, user_inviting):
+        """ invite user to orga """
+        if user_inviting not in self.admins:
+            raise UserIsNotAdmin
+        if user_to_add in self.invitations:
+            raise UserIsAlreadyInvited
+        if user_to_add in self.users:
+            raise UserIsAlredyInOrganization
+
+        self.invitations.append(user_to_add)
+        db.session.commit()  # pylint: disable = E1101
+
+    def add_invalid_word(self, word):
+        """ add invalid word to orga """
+        word_to_add = Word.add_word(word, self.id)
+        self.words.append(word_to_add)
+        db.session.commit()  # pylint: disable = E1101
+
+    def delete_invalid_word(self, word):
+        """ deletes invalid word in orga """
+        Word.delete_word(word, self.id)
+
+    def delete_all_invalid_words(self):
+        """ delete all words in orga """
+        for word in self.words:
+            self.delete_invalid_word(word.word)

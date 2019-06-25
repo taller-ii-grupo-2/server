@@ -108,3 +108,18 @@ class Channel(db.Model):
     def get_users_in_channel(name, org_id):
         """ get users in channel of orga """
         return Channel.get_channel_with_name(name, org_id).users
+
+    @staticmethod
+    def delete_channel(name, org_id):
+        """ delete channel """
+        channel = Channel.get_channel_with_name(name, org_id)
+        channel.users.clear()
+        db.session.commit()  # pylint: disable = E1101
+
+        Channel.query.filter_by(name=name,
+                                organization_id=org_id).delete()
+
+    def remove_user(self, user):
+        """remove user from channel"""
+        self.users.remove(user)
+        db.session.commit()  # pylint: disable = E1101

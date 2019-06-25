@@ -1,6 +1,6 @@
 from app.users import User
 from app.organizations import Organization
-from app.exceptions import InvalidMail, SignedMail, InvalidToken, UserNotRegistered, UserIsNotAdmin, UserIsNotCreator
+from app.exceptions import InvalidMail, SignedMail, InvalidToken, UserNotRegistered, UserIsNotAdmin, UserIsNotCreator, UserIsCreator
 from firebase_admin import auth
 import pytest
 from pytest_mock import mocker
@@ -63,6 +63,7 @@ def test_user_add_admin_to_organization(mocker):
 	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
 	user.make_admin_user(user2,orga)
 	assert len(orga.admins) == 2
@@ -75,7 +76,9 @@ def test_user_add_admin_to_organization_without_being_admin(mocker):
 	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
 	orga = Organization.create('org_name', 'www.asd.com',user,
                                      'desc','welcome_message')
+	orga.invite_user(user2, user)
 	orga.add_user(user2)
+	orga.invite_user(user3, user)
 	orga.add_user(user3)
 	with pytest.raises(UserIsNotCreator):
 		user2.make_admin_user(user3,orga)
@@ -88,3 +91,50 @@ def test_total_amount_of_users(mocker):
 	count = User.amount()
 	assert count == 2
 
+def test_delete_creator_of_orga(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
+	with pytest.raises(UserIsCreator):
+		user.remove_user_from_orga(orga,user)
+
+def test_delete_without_being_admin(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user3 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payasssfsfdlian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
+	orga.invite_user(user2, user)
+	orga.add_user(user2)
+	orga.invite_user(user3, user)
+	orga.add_user(user3)
+	with pytest.raises(UserIsNotAdmin):
+		user2.remove_user_from_orga(orga,user3)
+
+
+def test_delete_orga_without_being_creator(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	user2 = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
+	orga.invite_user(user2, user)
+	orga.add_user(user2)
+	with pytest.raises(UserIsNotCreator):
+		user2.delete_orga('org_name')
+
+
+def test_delete_orga_being_creator(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	orga = Organization.create('org_name', 'www.asd.com',user,
+                                     'desc','welcome_message')
+
+	user.delete_orga('org_name')
+	assert len(user.organizations) == 0

@@ -61,3 +61,18 @@ def test_add_users_already_in_channel(mocker):
 	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
 	channel.add_users(users)
 	assert len(channel.users) == 3
+
+def test_delete_channel():
+	Channel.add_channel('asds',True,1,'asd','asd',1)
+	Channel.delete_channel('asds',1)
+	with pytest.raises(InvalidChannel):
+		Channel.get_channel_with_name('asds', 1)
+
+def test_remove_user_from_channel(mocker):
+	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
+	mocker.patch('app.fb_user.FbUser.get_user_by_email',return_value=mock_user)
+	user = User.add_user('agustin','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com','agustin.payaslian@gmail.com',3.14,3.14,'agustin.payaslian@gmail.com')
+	channel = Channel.add_channel('asds',True,1,'asd','asd',1)
+	channel.add_user(user)
+	channel.remove_user(user)
+	assert len(channel.users) == 0
