@@ -11,6 +11,7 @@ from app.associations import ORGS
 
 
 # pylint: disable = R0902
+# pylint: disable = too-many-public-methods
 class User(db.Model):
     """ name table structure """
     __tablename__ = 'users'
@@ -224,3 +225,17 @@ class User(db.Model):
                 return
 
         raise UserIsNotCreator
+
+    def get_user_info(self):
+        """" get users info as a md string """
+        info = "# " + self.mail + "'s info:\n"
+        info += "- Name: " + self.name + "\n"
+        info += "- Surname: " + self.surname + "\n"
+        info += "- Location:\n"
+        info += "  - Lat.: " + str(self.latitude) + "\n"
+        info += "  - Lon.: " + str(self.longitude) + "\n"
+        info += "- Organizations:\n"
+        for orga in self.organizations:
+            info += "  -" + orga.name + "\n"
+
+        return info

@@ -6,6 +6,8 @@ from flask_socketio import emit
 import sqlalchemy.exc as sql
 from flask_jwt_extended import jwt_required
 from firebase_admin import messaging
+import requests
+
 from app.users import User  # pylint: disable = syntax-error
 from app.organizations import Organization
 from app.exceptions import InvalidOrganizationName
@@ -23,6 +25,7 @@ from app.exceptions import NotAdminWeb, UserIsCreator, UserIsNotAdmin
 from app.admins import Admin
 from app.messages import Message
 from app.channels import Channel
+from app.bots import Bot
 
 
 class Index(Resource):
@@ -31,6 +34,15 @@ class Index(Resource):
     def get(cls):
         """get mmethod"""
         app.logger.info('home visited')  # pylint: disable=no-member
+        return "get received"
+
+    @classmethod
+    def post(cls):
+        """post mmethod"""
+        # pylint: disable=no-member
+        app.logger.info('home visited by post method')
+
+        return "post received"
 
 
 class Android(Resource):
@@ -575,6 +587,75 @@ class InvalidWords(Resource):
         return response
 
 
+class AdminBots(Resource):
+    """admin bot"""
+    @classmethod
+    @jwt_required
+    def post(cls):
+        """ adds new bot"""
+        content = request.get_json()
+        name = content['name']
+        url = content['url']
+        description = content['description']
+        org_name = content['org_name']
+        try:
+            orga = Organization.get_organization_by_name(org_name)
+            orga.add_bot(name, url, description)
+            response = jsonify({'message': 'bot added'})
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    @classmethod
+    @jwt_required
+    def get(cls):
+        """get all bots"""
+        retrieved_bots = Bot.get_all_bots()
+        bots_to_send = []
+        for bot in retrieved_bots:
+            bots_to_send.append({'name': bot.name,
+                                 'url': bot.url,
+                                 'description': bot.description,
+                                 'org_id': bot.organization_id})
+        return bots_to_send
+
+
+class ChannelInfoForBot(Resource):
+    """ channel info for bots """
+    @classmethod
+    def get(cls, organization_name, channel_name):
+        """ get info from channel """
+        try:
+            organization_id = Organization.\
+                                get_organization_by_name(organization_name).id
+            channel = Channel.get_channel_with_name(channel_name,
+                                                    organization_id)
+            return channel.get_channel_info()
+        except InvalidChannel as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+
+        return response
+
+
+class UsersInfoForBot(Resource):
+    """ user info for bots """
+    @classmethod
+    def get(cls, user_mail):
+        """ get info from user """
+        try:
+            user = User.get_user_by_mail(user_mail)
+            return user.get_user_info()
+        except InvalidUser as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+
+        return response
+
+
 def save_msg(msg, user_id):
     """ save received msg to db """
     content = json.loads(msg)
@@ -605,6 +686,8 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 'author_mail': author_mail,
                 'timestamp': str(timestamp)}
 
+    process_mentions(msg_body, org_name, channel_name, author_mail)
+
     if channel_name:
         users = Channel.get_users_in_channel(channel_name, org_id)
         for user in users:
@@ -630,6 +713,57 @@ def notify_user(topic, title, body):
         notification=messaging.Notification(title=title, body=body),
         topic=topic)
     messaging.send(message)
+
+
+def process_mentions(msg_body, orga_name, channel_name, user_mail):
+    """
+    detect '@' char and derive behaviour
+    according to usermention or bot invocation.
+    """
+    for word in msg_body.split():
+        if word.startswith("@"):
+            if is_user_mention(word):
+                process_user_mention(word, orga_name, channel_name)
+            else:
+                process_bot_mention(word, msg_body.split(word, 1)[1][1:],
+                                    orga_name, channel_name, user_mail)
+
+
+def is_user_mention(word):
+    """ check if the mention is mentioning a user email address """
+    return "@" in word[1:]
+
+
+def process_bot_mention(bot_name, arg, organization_name,
+                        channel_name, user_mail):
+    """ process bot """
+    org_id = Organization.get_organization_by_name(organization_name).id
+
+    url = Bot.get_bot(bot_name, org_id).url
+    response_text = requests.post(url,
+                                  data={'arg': arg,
+                                        'user_mail': user_mail,
+                                        'organization_name': organization_name,
+                                        'channel_name': channel_name}).text
+
+    if not response_text:
+        return
+
+    dm_dest = ""
+
+    msg = Message.add_message(organization_name,
+                              channel_name, dm_dest, bot_name, response_text)
+
+    deliver_msg(response_text, organization_name, channel_name, bot_name,
+                msg.timestamp, dm_dest)
+
+
+def process_user_mention(word, orga_name, channel_name):
+    """ define what happens when users get mentioned """
+    topic = word[1:]
+    title = "New mention in chat!"
+    body = "You've been mentioned in " + orga_name + ", " + channel_name
+    notify_user(topic, title, body)
 
 
 @socketio.on('message')

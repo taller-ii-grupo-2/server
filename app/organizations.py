@@ -14,6 +14,7 @@ from app.exceptions import UserIsAlreadyInvited, UserIsNotInvited
 from app.associations import ADMINS, INVS
 from app.channels import Channel
 from app.words import Word
+from app.bots import Bot
 from app import constant
 
 
@@ -37,6 +38,7 @@ class Organization(db.Model):
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     channels = db.relationship('Channel', backref='organization', lazy=True)
     words = db.relationship('Word', backref='organization', lazy=True)
+    bots = db.relationship('Bot', backref='bot', lazy=True)
     invitations = db.relationship(
         'User',
         secondary=INVS,
@@ -329,3 +331,7 @@ class Organization(db.Model):
         """ delete all words in orga """
         for word in self.words:
             self.delete_invalid_word(word.word)
+
+    def add_bot(self, name, url, description):
+        """ add invalid bot to orga """
+        Bot.add_bot(name, url, description, self.id)
