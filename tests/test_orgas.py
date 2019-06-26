@@ -142,6 +142,8 @@ def test_get_user_in_private_channel(mocker):
 	orga.add_user(user2)
 	channel = orga.create_channel('asd',True,user2,'sad','asd')
 	assert len(channel.users) == 1
+	assert len(orga.get_channels_with_user(user.id)) == 2
+	assert len(orga.get_channels_with_user(user2.id)) == 3
 
 def test_get_users_per_channel(mocker):
 	mock_user={'name': 'agustin', 'mail': 'agustin.payaslian@gmail.com' }
@@ -153,9 +155,9 @@ def test_get_users_per_channel(mocker):
                                      'desc','welcome_message')
 	orga.invite_user(user2, user)
 	orga.add_user(user2)
-	channel = orga.create_channel('asd',True,user2,'sad','asd')
-	assert len(orga.get_channels_with_user(user.id)) == 2
-	assert len(orga.get_channels_with_user(user2.id)) == 3
+	channel = orga.create_channel('asd',True,user,'sad','asd')
+	assert len(orga.get_channels_with_user(user.id)) == 3
+	assert len(orga.get_channels_with_user(user2.id)) == 2
 
 
 def test_create_channel_then_add_user(mocker):

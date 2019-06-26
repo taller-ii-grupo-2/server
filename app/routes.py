@@ -445,13 +445,13 @@ class Channels(Resource):
         content = request.get_json()
         org_name = content['nameOrga']
         channel_name = content['channel_name']
-        public = content['public']
+        private = content['private']
         description = content['desc']
         session_cookie = request.cookies.get('session')
         try:
             user = User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
-            orga.create_channel(channel_name, public, user,
+            orga.create_channel(channel_name, private, user,
                                 description, 'wm')
             data = {'message': 'user added'}
             response = jsonify(data)
