@@ -123,3 +123,13 @@ class Channel(db.Model):
         """remove user from channel"""
         self.users.remove(user)
         db.session.commit()  # pylint: disable = E1101
+
+    def get_channel_info(self):
+        """ get channels info as md string """
+        info = ""
+        info += "# Integrantes:\n"
+        for user in self.users:
+            info += "- "
+            info += user.mail
+
+        return info
