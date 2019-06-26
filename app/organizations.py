@@ -161,7 +161,7 @@ class Organization(db.Model):
         for channel in self.channels:
             for user in channel.users:
                 if user.id == user_id:
-                    channels.append(channel)
+                    channels.append(channel.name)
 
         return channels
 

@@ -414,13 +414,10 @@ class UserOrganizationsChannels(Resource):
         app.logger.info('in user organization channels')
         session_cookie = request.cookies.get('session')
         try:
-            User.get_user_with_cookie(session_cookie)
+            user = User.get_user_with_cookie(session_cookie)
             orga = Organization.get_organization_by_name(org_name)
-            channel_names = []
+            channel_names = orga.get_channels_with_user(user.id)
             member_mails = []
-
-            for channel in orga.channels:
-                channel_names.append(channel.name)
 
             for member in orga.users:
                 member_mails.append(member.mail)
