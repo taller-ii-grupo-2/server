@@ -296,7 +296,7 @@ class Organization(db.Model):
 
     def update_user(self, user_updating, user_to_update, role):
         """ update role of the user """
-        if role == 'Admin' and user_updating.id == self.admins:
+        if role == 'Admin' and and user_updating.id == self.creator_user_id:
             self.add_admin(user_to_update)
         elif role == "Member" and user_updating.id in self.admins:
             self.remove_admin(user_to_update)
