@@ -39,7 +39,7 @@ api.add_resource(routes.AllUsers, '/users/all')
 
 api.add_resource(routes.OrganizationMembers, '/organizations/members')
 api.add_resource(routes.OrganizationChannels, '/organizations/channels')
-api.add_resource(routes.Profile, '/profile/<name>')
+api.add_resource(routes.Profile, '/profile/<mail>')
 api.add_resource(routes.OrganizationMembersLocations,
                  '/organizations/<org_name>/members/locations')
 api.add_resource(routes.Organizations, '/organizations')
