@@ -25,6 +25,7 @@ from app.exceptions import NotAdminWeb, UserIsCreator, UserIsNotAdmin
 from app.admins import Admin
 from app.messages import Message
 from app.channels import Channel
+from app.fb_user import FbUser, URL
 from app.bots import Bot
 
 
@@ -172,11 +173,13 @@ class DeleteUsers(Resource):
 
 class DeleteUser(Resource):
     """delete users endpoint"""
+
     @classmethod
     def delete(cls):
         """delete method"""
         content = request.get_json()
         mail = content['mail']
+        FbUser.remove_user(mail)
         User.delete_user_with_mail(mail)
 
 
@@ -536,6 +539,7 @@ class PrivateMessages(Resource):
 
 class AdminLogin(Resource):
     """ manage login from admin webs """
+
     @classmethod
     def post(cls):
         """ login admins """
@@ -554,16 +558,85 @@ class AdminLogin(Resource):
         return response
 
 
-class AdminSeeUsers(Resource):
+class AdminUsers(Resource):
     """ manage login from admin webs """
+
+    @classmethod
+    @jwt_required
+    def options(cls):
+        """post method"""
+
+        response = jsonify({'message': 'options'})
+        response.status_code = 200
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers["Access-Control-Allow-Methods"] = \
+            'DELETE, POST, GET, PUT, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = \
+            "Content-Type, Authorization, Accept"
+        return response
+
+    @classmethod
+    @jwt_required
+    def post(cls):
+        """post method"""
+        content = request.get_json()
+        user_name = content['username']
+        name = content['name']
+        surname = content['surname']
+        password = content['password']
+        mail = content['mail']
+        try:
+            FbUser.add_user(mail, password, user_name, None)
+            User.add_user(user_name, name, surname, mail, 0, 0, URL)
+            response = jsonify({'message': 'user added'})
+            response.status_code = 200
+        except (SignedMail, InvalidMail) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
     @classmethod
     @jwt_required
     def get(cls):
         """ login admins """
-        count = User.amount()
-        response = jsonify({'count': count})
+        users = User.get_users()
+        response = jsonify(users)
         response.status_code = 200
-        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    @classmethod
+    @jwt_required
+    def delete(cls):
+        """delete method"""
+        mail = request.args['mail']
+        try:
+            FbUser.remove_user(mail)
+            User.delete_user_with_mail(mail)
+            response = jsonify({'message': 'user deleted'})
+            response.status_code = 200
+        except (InvalidMail, UserNotRegistered) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    @jwt_required
+    def put(cls):
+        """delete method"""
+        content = request.get_json()
+        user_name = content['username']
+        name = content['name']
+        surname = content['surname']
+        mail = content['mail']
+        try:
+            user = User.get_user_by_mail(mail)
+            user.change(user_name, name, surname, user.url)
+            FbUser.change_user(mail, user_name, user.url)
+            response = jsonify({'message': 'User changed'})
+            response.status_code = 200
+        except (InvalidMail, SignedMail, UserNotRegistered) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
         return response
 
 

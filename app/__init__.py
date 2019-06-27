@@ -59,7 +59,7 @@ api.add_resource(routes.UsersFromChannels, '/channels/users')
 api.add_resource(routes.Messages, '/messages/<orga_name>/<channel_name>')
 api.add_resource(routes.PrivateMessages,
                  '/messages/<orga_name>/dms/<dm_dest_mail>')
-api.add_resource(routes.AdminSeeUsers, '/users/total')
+api.add_resource(routes.AdminUsers, '/admin/users')
 api.add_resource(routes.InvalidWords, '/organizations/invalidwords')
 api.add_resource(routes.AdminBots, '/admin/bots')
 api.add_resource(routes.ChannelInfoForBot,

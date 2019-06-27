@@ -239,3 +239,20 @@ class User(db.Model):
             info += "  -" + orga.name + "\n"
 
         return info
+
+    @staticmethod
+    def get_users():
+        """ table to json """
+        users = User.query.all()
+        users_serialized = []
+
+        for user in users:
+            u_s = {
+                'mail': user.mail,
+                'name': user.name,
+                'username': user.user_name,
+                'surname': user.surname
+            }
+            users_serialized.append(u_s)
+
+        return users_serialized
