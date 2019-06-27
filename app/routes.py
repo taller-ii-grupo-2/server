@@ -1,4 +1,5 @@
 """File containing all endpoints in the app."""
+# pylint: disable=too-many-lines
 import json
 from flask import request, jsonify
 from flask_restful import Resource
@@ -27,6 +28,7 @@ from app.messages import Message
 from app.channels import Channel
 from app.fb_user import FbUser, URL
 from app.bots import Bot
+from app.words import Word
 
 
 class Index(Resource):
@@ -777,6 +779,28 @@ class InvalidWords(Resource):
         return response
 
 
+class HardcodeBots(Resource):
+    """admin bot"""
+    @classmethod
+    def post(cls):
+        """ adds new bot"""
+        content = request.get_json()
+        name = content['name']
+        url = content['url']
+        description = content['description']
+        org_name = content['org_name']
+        try:
+            orga = Organization.get_organization_by_name(org_name)
+            orga.add_bot(name, url, description)
+            response = jsonify({'message': 'bot added'})
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+
 class AdminBots(Resource):
     """admin bot"""
     @classmethod
@@ -863,13 +887,17 @@ def save_msg(msg, user_id):
                 dm_dest)
 
 
-def replace_banned_words(msg, organization):
+def replace_banned_words(msg, org_name):
+    """ replace banned words with asteriscs """
     my_str = msg
-    banned_words = Word.get_words_for_orga(organization)
+    org_id = Organization.get_organization_by_name(org_name).id
+    banned_words = Word.get_words_for_orga(org_id)
     for word in banned_words:
-        my_str = str.replace(my_str, word)
+        my_str.replace(word.word, "****")
 
     return my_str
+
+
 # pylint: disable=R0913
 def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 dm_dest):
@@ -941,7 +969,7 @@ def process_bot_mention(bot_name, arg, organization_name,
     if bot is None:
         bot = Bot.get_bot(bot_name, org_id)
     if bot is None:
-        return 
+        return
 
     response_text = requests.post(bot.url,
                                   data={'arg': arg,
