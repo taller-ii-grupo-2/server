@@ -855,6 +855,7 @@ def save_msg(msg, user_id):
     dm_dest = content['dm_dest']
     author_mail = User.get_user_by_id(user_id).mail
     body = content['body']
+    body = replace_banned_words(body, organization)
     msg = Message.add_message(organization,
                               channel, dm_dest, author_mail, body)
 
@@ -862,6 +863,13 @@ def save_msg(msg, user_id):
                 dm_dest)
 
 
+def replace_banned_words(msg, organization):
+    my_str = msg
+    banned_words = Word.get_words_for_orga(organization)
+    for word in banned_words:
+        my_str = str.replace(my_str, word)
+
+    return my_str
 # pylint: disable=R0913
 def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 dm_dest):

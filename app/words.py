@@ -58,3 +58,9 @@ class Word(db.Model):
         Word.query.filter_by(word=word,
                              organization_id=org_id).delete()
         db.session.commit()  # pylint: disable = E1101
+
+    def get_words_for_orga(organization_name):
+        """ gets words for given orga"""
+        org_id = Organization.get_organization_by_name(organization_name).id
+        return Word.query.filter_by(organization_id=org_id).all()
+
