@@ -884,8 +884,6 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 'author_mail': author_mail,
                 'timestamp': str(timestamp)}
 
-    process_mentions(msg_body, org_name, channel_name, author_mail)
-
     if channel_name:
         users = Channel.get_users_in_channel(channel_name, org_id)
         for user in users:
@@ -902,6 +900,8 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
         if User.is_online(dm_dest):
             sid = User.get_user_by_mail(dm_dest).sid
             emit('message', msg_dict, room=sid)
+
+    process_mentions(msg_body, org_name, channel_name, author_mail)
 
 
 # pylint: enable=too-many-arguments
