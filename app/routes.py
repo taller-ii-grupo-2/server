@@ -614,7 +614,7 @@ class AdminUsers(Resource):
             User.delete_user_with_mail(mail)
             response = jsonify({'message': 'user deleted'})
             response.status_code = 200
-        except (InvalidMail, UserNotRegistered) as error:
+        except (InvalidMail) as error:
             response = jsonify({'message': error.message})
             response.status_code = error.code
         return response
@@ -640,6 +640,93 @@ class AdminUsers(Resource):
         return response
 
 
+class AdminOrgas(Resource):
+    """ manage login from admin webs """
+
+    @classmethod
+    @jwt_required
+    def options(cls):
+        """post method"""
+
+        response = jsonify({'message': 'options'})
+        response.status_code = 200
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        response.headers["Access-Control-Allow-Methods"] = \
+            'DELETE, POST, GET, PUT, OPTIONS'
+        response.headers['Access-Control-Allow-Headers'] = \
+            "Content-Type, Authorization, Accept"
+        return response
+
+    @classmethod
+    @jwt_required
+    def post(cls):
+        """post method"""
+        content = request.get_json(force=True)
+        mail = content['mail']
+        org_name = content['name']
+        description = content['description']
+        welcome_message = content['welcomMsg']
+
+        # pylint: disable=no-member
+        try:
+            creator_user = User.get_user_by_mail(mail)
+            Organization.create(org_name, URL, creator_user,
+                                description, welcome_message)
+            data = {'message': 'orga added'}
+            response = jsonify(data)
+            response.status_code = 200
+        except(InvalidOrganizationName, SignedOrganization) as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    @jwt_required
+    def get(cls):
+        """ login admins """
+        orgas = Organization.get_orgas()
+        for orga in orgas:
+            orga['creator'] = User.get_user_by_id(orga['creator']).mail
+        response = jsonify(orgas)
+        response.status_code = 200
+        return response
+
+    @classmethod
+    @jwt_required
+    def delete(cls):
+        """ delete orga"""
+        org_name = request.args['name']
+
+        try:
+            Organization.delete_organization(org_name)
+            data = {'message': 'orga deleted'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        except InvalidOrganization as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+    @classmethod
+    @jwt_required
+    def put(cls):
+        """delete method"""
+        content = request.get_json()
+        org_name = content['name']
+        description = content['description']
+        welcome_message = content['welcomMsg']
+        try:
+            orga = Organization.get_organization_by_name(org_name)
+            orga.change(description, welcome_message, orga.url)
+            response = jsonify({'message': 'Orga changed'})
+            response.status_code = 200
+        except InvalidOrganization as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        return response
+
+
 class InvalidWords(Resource):
     """manage invalid words """
     @classmethod
@@ -652,6 +739,36 @@ class InvalidWords(Resource):
             orga = Organization.get_organization_by_name(org_name)
             orga.add_invalid_word(word)
             response = jsonify({'message': 'word added'})
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    @classmethod
+    def delete(cls):
+        """ adds invalid word to orga """
+        content = request.get_json()
+        word = content['word']
+        org_name = content['org_name']
+        try:
+            orga = Organization.get_organization_by_name(org_name)
+            orga.delete_invalid_word(word)
+            response = jsonify({'message': 'word deleted'})
+            response.status_code = 200
+        except NotAdminWeb as error:
+            response = jsonify({'message': error.message})
+            response.status_code = error.code
+        response.headers['Access-Control-Allow-Origin'] = '*'
+        return response
+
+    @classmethod
+    def get(cls):
+        """ adds invalid word to orga """
+        try:
+            orgas = Organization.get_orgas_with_words()
+            response = jsonify(orgas)
             response.status_code = 200
         except NotAdminWeb as error:
             response = jsonify({'message': error.message})

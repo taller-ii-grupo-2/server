@@ -57,3 +57,4 @@ class Word(db.Model):
         """ deletes word """
         Word.query.filter_by(word=word,
                              organization_id=org_id).delete()
+        db.session.commit()  # pylint: disable = E1101

@@ -123,9 +123,13 @@ class User(db.Model):
     @staticmethod
     def delete_user_with_mail(mail):
         """ delete entries in table """
+        user = User.get_user_by_mail(mail)
+        for orga in user.organizations:
+            if orga.creator_user_id == user.id:
+                Organization.delete_organization(orga.name)
+        user.organizations.clear()
         User.query.filter_by(mail=mail).delete()
         db.session.commit()  # pylint: disable = E1101
-        # FbUser.delete_user_with_email(mail)
 
     @staticmethod
     def get_user_by_mail(mail):

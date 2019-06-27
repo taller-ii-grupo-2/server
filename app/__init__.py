@@ -65,5 +65,6 @@ api.add_resource(routes.AdminBots, '/admin/bots')
 api.add_resource(routes.ChannelInfoForBot,
                  '/bots/<organization_name>/<channel_name>')
 api.add_resource(routes.UsersInfoForBot, '/bots/users/<user_mail>')
+api.add_resource(routes.AdminOrgas, '/admin/orgas')
 
 app.logger.info('in main')

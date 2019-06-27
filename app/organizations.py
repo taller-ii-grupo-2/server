@@ -245,8 +245,8 @@ class Organization(db.Model):
         orga.delete_all_invalid_words()
         orga.admins.clear()
         orga.users.clear()
-        db.session.commit()  # pylint: disable = E1101
         Organization.query.filter_by(name=orga.name).delete()
+        db.session.commit()  # pylint: disable = E1101
 
     def delete_all_channels(self):
         """ delete all channels """
@@ -335,3 +335,50 @@ class Organization(db.Model):
     def add_bot(self, name, url, description):
         """ add invalid bot to orga """
         Bot.add_bot(name, url, description, self.id)
+
+    @staticmethod
+    def get_orgas():
+        """ get all organizations """
+        orgas = Organization.query.all()
+        orgas_serialized = []
+
+        for orga in orgas:
+            u_s = {
+                'name': orga.name,
+                'description': orga.description,
+                'welcome': orga.welcome_message,
+                'creator': orga.creator_user_id
+            }
+            orgas_serialized.append(u_s)
+
+        return orgas_serialized
+
+    def change(self, desc, welcome, url):
+        """ change orga """
+        self.description = desc
+        self.welcome_message = welcome
+        self.url = url
+        db.session.commit()  # pylint: disable = E1101
+
+    def get_words(self):
+        """ get words of orga """
+        string_words = []
+        for word in self.words:
+            string_words.append(word.word + ' ')
+
+        return string_words
+
+    @staticmethod
+    def get_orgas_with_words():
+        """ getall orgas with its words """
+        orgas = Organization.query.all()
+        org_and_words = []
+
+        for orga in orgas:
+            o_w = {
+                'orga': orga.name,
+                'words': orga.get_words()
+            }
+            org_and_words.append(o_w)
+
+        return org_and_words
