@@ -791,7 +791,11 @@ class HardcodeBots(Resource):
         org_name = content['org_name']
         try:
             orga = Organization.get_organization_by_name(org_name)
-            orga.add_bot(name, url, description)
+            if orga is not None:
+                orga_id = orga.id
+            else:
+                orga_id = ""
+            Organization.add_bot(name, url, description, orga_id)
             response = jsonify({'message': 'bot added'})
             response.status_code = 200
         except NotAdminWeb as error:

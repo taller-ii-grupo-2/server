@@ -69,6 +69,8 @@ class Bot(db.Model):
     @staticmethod
     def get_bot(name, org_id=""):
         """ gets bot in org by name """
+        if org_id == "":
+            return Bot.query.filter_by(name=name).first()
         return Bot.query.filter_by(name=name, organization_id=org_id).first()
 
     @staticmethod
