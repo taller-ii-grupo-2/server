@@ -610,7 +610,7 @@ class AdminUsers(Resource):
         """delete method"""
         mail = request.args['mail']
         try:
-            # FbUser.remove_user(mail)
+            FbUser.remove_user(mail)
             User.delete_user_with_mail(mail)
             response = jsonify({'message': 'user deleted'})
             response.status_code = 200
