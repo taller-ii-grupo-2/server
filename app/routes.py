@@ -940,6 +940,8 @@ def process_bot_mention(bot_name, arg, organization_name,
     bot = Bot.get_bot(bot_name)
     if bot is None:
         bot = Bot.get_bot(bot_name, org_id)
+    if bot is None:
+        return 
 
     response_text = requests.post(bot.url,
                                   data={'arg': arg,
