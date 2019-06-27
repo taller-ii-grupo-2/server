@@ -937,8 +937,11 @@ def process_bot_mention(bot_name, arg, organization_name,
     """ process bot """
     org_id = Organization.get_organization_by_name(organization_name).id
 
-    url = Bot.get_bot(bot_name, org_id).url
-    response_text = requests.post(url,
+    bot = Bot.get_bot(bot_name)
+    if bot is None:
+        bot = Bot.get_bot(bot_name, org_id)
+
+    response_text = requests.post(bot.url,
                                   data={'arg': arg,
                                         'user_mail': user_mail,
                                         'organization_name': organization_name,

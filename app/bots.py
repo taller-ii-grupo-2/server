@@ -69,7 +69,7 @@ class Bot(db.Model):
     @staticmethod
     def get_bot(name, org_id=""):
         """ gets bot in org by name """
-        return Bot.query.filter_by(name=name, organization_id=org_id).first()
+        bot = Bot.query.filter_by(name=name, organization_id=org_id).first()
 
     @staticmethod
     def delete_bot(name, org_id):
