@@ -128,6 +128,7 @@ class User(db.Model):
             if orga.creator_user_id == user.id:
                 Organization.delete_organization(orga.name)
         user.organizations.clear()
+        user.channels.clear()
         User.query.filter_by(mail=mail).delete()
         db.session.commit()  # pylint: disable = E1101
 

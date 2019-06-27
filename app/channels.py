@@ -22,7 +22,7 @@ class Channel(db.Model):
     welcome_message = db.Column(db.String())
     organization_id = db.Column(db.Integer, db.ForeignKey('organizations.id'),
                                 nullable=False)
-    users = db.relationship('User', secondary=USRS)
+    users = db.relationship('User', secondary=USRS, , backref='channels', lazy=True)
 
     # pylint: disable = R0913
     def __init__(self, name, private, creator_user_id, description,
