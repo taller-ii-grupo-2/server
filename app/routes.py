@@ -1,5 +1,6 @@
 """File containing all endpoints in the app."""
 # pylint: disable=too-many-lines
+import re
 import json
 from flask import request, jsonify
 from flask_restful import Resource
@@ -864,9 +865,11 @@ def replace_banned_words(msg, org_name):
     app.logger.info(org_name)  # pylint: disable=no-member
     my_str = msg
     org_id = Organization.get_organization_by_name(org_name).id
+    app.logger.info(org_id)  # pylint: disable=no-member
     banned_words = Word.get_words_for_orga(org_id)
     for word in banned_words:
-        my_str.replace(word.word, "****")
+        insensistive_word = re.compile(re.escape(word.word), re.IGNORECASE)
+        my_str = insensistive_word.sub(r"`¯\_(ツ)_/¯`", my_str)
 
     return my_str
 
