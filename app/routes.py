@@ -779,46 +779,20 @@ class InvalidWords(Resource):
         return response
 
 
-class HardcodeBots(Resource):
-    """admin bot"""
-    @classmethod
-    def post(cls):
-        """ adds new bot"""
-        content = request.get_json()
-        name = content['name']
-        url = content['url']
-        description = content['description']
-        org_name = content['org_name']
-        try:
-            orga = Organization.get_organization_by_name(org_name)
-            if orga is not None:
-                orga_id = orga.id
-            else:
-                orga_id = ""
-            Organization.add_bot(name, url, description, orga_id)
-            response = jsonify({'message': 'bot added'})
-            response.status_code = 200
-        except NotAdminWeb as error:
-            response = jsonify({'message': error.message})
-            response.status_code = error.code
-        response.headers['Access-Control-Allow-Origin'] = '*'
-        return response
-
-
 class AdminBots(Resource):
     """admin bot"""
     @classmethod
     @jwt_required
     def post(cls):
         """ adds new bot"""
-        content = request.get_json()
+        content = request.get_json(force=True)
         name = content['name']
         url = content['url']
         description = content['description']
         org_name = content['org_name']
+        app.logger.info(content)  # pylint: disable=no-member
         try:
-            orga = Organization.get_organization_by_name(org_name)
-            orga.add_bot(name, url, description)
+            Bot.add_bot(name, url, description, org_name)
             response = jsonify({'message': 'bot added'})
             response.status_code = 200
         except NotAdminWeb as error:
@@ -839,24 +813,6 @@ class AdminBots(Resource):
                                  'description': bot.description,
                                  'org_id': bot.organization_id})
         return bots_to_send
-
-
-class ChannelInfoForBot(Resource):
-    """ channel info for bots """
-    @classmethod
-    def get(cls, organization_name, channel_name):
-        """ get info from channel """
-        try:
-            organization_id = Organization.\
-                                get_organization_by_name(organization_name).id
-            channel = Channel.get_channel_with_name(channel_name,
-                                                    organization_id)
-            return channel.get_channel_info()
-        except InvalidChannel as error:
-            response = jsonify({'message': error.message})
-            response.status_code = error.code
-
-        return response
 
 
 class UsersInfoForBot(Resource):
@@ -906,7 +862,7 @@ def replace_banned_words(msg, org_name):
 
 # pylint: disable=R0913
 def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
-                dm_dest):
+                dm_dest, comes_from_bot=False):
     """ deliver msg to connected users. """
 
     org_id = Organization.get_organization_by_name(org_name).id
@@ -942,7 +898,9 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 sid = User.get_user_by_mail(dm_dest).sid
                 emit('message', msg_dict, room=sid)
 
-    process_mentions(msg_body, org_name, channel_name, author_mail)
+    if not comes_from_bot:
+        process_mentions(msg_body, org_name, channel_name,
+                         author_mail, dm_dest)
 
 
 # pylint: enable=too-many-arguments
@@ -954,7 +912,7 @@ def notify_user(topic, title, body):
     messaging.send(message)
 
 
-def process_mentions(msg_body, orga_name, channel_name, user_mail):
+def process_mentions(msg_body, orga_name, channel_name, user_mail, dm_dest):
     """
     detect '@' char and derive behaviour
     according to usermention or bot invocation.
@@ -965,7 +923,8 @@ def process_mentions(msg_body, orga_name, channel_name, user_mail):
                 process_user_mention(word, orga_name, channel_name)
             else:
                 process_bot_mention(word, msg_body.split(word, 1)[1][1:],
-                                    orga_name, channel_name, user_mail)
+                                    orga_name, channel_name, user_mail,
+                                    dm_dest)
 
 
 def is_user_mention(word):
@@ -973,33 +932,38 @@ def is_user_mention(word):
     return "@" in word[1:]
 
 
+# pylint: disable=too-many-arguments
 def process_bot_mention(bot_name, arg, organization_name,
-                        channel_name, user_mail):
+                        channel_name, user_mail, dm_dest):
     """ process bot """
-    org_id = Organization.get_organization_by_name(organization_name).id
-
-    bot = Bot.get_bot(bot_name)
+    bot = Bot.get_bot(bot_name[1:], organization_name)
     if bot is None:
-        bot = Bot.get_bot(bot_name, org_id)
+        bot = Bot.get_bot(bot_name[1:])
     if bot is None:
+        app.logger.info('bot not found')  # pylint: disable=no-member
         return
 
+    user_info = User.get_info_from(user_mail)
+    channel_info = Organization.get_info_from(organization_name, channel_name)
+
     response_text = requests.post(bot.url,
-                                  data={'arg': arg,
+                                  json={'arg': arg,
                                         'user_mail': user_mail,
+                                        'user_info': user_info,
                                         'organization_name': organization_name,
+                                        'channel_info': channel_info,
                                         'channel_name': channel_name}).text
 
     if not response_text:
         return
 
-    dm_dest = ""
-
     msg = Message.add_message(organization_name,
                               channel_name, dm_dest, bot_name, response_text)
 
     deliver_msg(response_text, organization_name, channel_name, bot_name,
-                msg.timestamp, dm_dest)
+                msg.timestamp, dm_dest, True)
+
+# pylint: enable=too-many-arguments
 
 
 def process_user_mention(word, orga_name, channel_name):

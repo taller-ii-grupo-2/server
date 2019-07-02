@@ -62,10 +62,7 @@ api.add_resource(routes.PrivateMessages,
 api.add_resource(routes.AdminUsers, '/admin/users')
 api.add_resource(routes.InvalidWords, '/organizations/invalidwords')
 api.add_resource(routes.AdminBots, '/admin/bots')
-api.add_resource(routes.ChannelInfoForBot,
-                 '/bots/<organization_name>/<channel_name>')
 api.add_resource(routes.UsersInfoForBot, '/bots/users/<user_mail>')
 api.add_resource(routes.AdminOrgas, '/admin/orgas')
-api.add_resource(routes.HardcodeBots, '/hardcode')
 
 app.logger.info('in main')

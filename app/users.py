@@ -246,6 +246,16 @@ class User(db.Model):
         return info
 
     @staticmethod
+    def get_info_from(user_mail):
+        """ get info from specified user """
+        app.logger.info('getting users info...')  # pylint: disable = E1101
+        try:
+            user = User.get_user_by_mail(user_mail)
+            return user.get_user_info()
+        except InvalidUser:
+            return ""
+
+    @staticmethod
     def get_users():
         """ table to json """
         users = User.query.all()
