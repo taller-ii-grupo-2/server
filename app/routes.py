@@ -893,6 +893,8 @@ def save_msg(msg, user_id):
 
 def replace_banned_words(msg, org_name):
     """ replace banned words with asteriscs """
+    app.logger.info("replacing banned words...")  # pylint: disable=no-member
+    app.logger.info(org_name)  # pylint: disable=no-member
     my_str = msg
     org_id = Organization.get_organization_by_name(org_name).id
     banned_words = Word.get_words_for_orga(org_id)
@@ -926,12 +928,19 @@ def deliver_msg(msg_body, org_name, channel_name, author_mail, timestamp,
                 sid = User.get_user_by_id(user.id).sid
                 emit('message', msg_dict, room=sid)
     else:
+        app.logger.info("pm received...")  # pylint: disable=no-member
         notify_user(dm_dest.replace("@", "~at~"),
                     "Message from " + author_mail,
                     msg_body)
-        if User.is_online(dm_dest):
-            sid = User.get_user_by_mail(dm_dest).sid
+
+        if User.is_online(author_mail):
+            sid = User.get_user_by_mail(author_mail).sid
             emit('message', msg_dict, room=sid)
+
+        if dm_dest != author_mail:
+            if User.is_online(dm_dest):
+                sid = User.get_user_by_mail(dm_dest).sid
+                emit('message', msg_dict, room=sid)
 
     process_mentions(msg_body, org_name, channel_name, author_mail)
 
