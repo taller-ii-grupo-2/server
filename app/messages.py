@@ -85,10 +85,14 @@ class Message(db.Model):
     def get_dms(orga_name, dm_dest_mail, asker_mail):
         """ get all private msgs for given org/users"""
         # pylint: disable = E1101
-        return db.session.query(Message).filter_by(
-            dm_dest_mail=dm_dest_mail).filter_by(
-                dm_dest_mail=asker_mail).filter_by(
-                    organization=orga_name)
+        return db.session.query(Message).\
+            filter(((Message.dm_dest_mail == dm_dest_mail) &
+                    (Message.organization == orga_name) &
+                    (Message.author_mail == asker_mail)) |
+                   ((Message.dm_dest_mail == asker_mail) &
+                    (Message.organization == orga_name) &
+                    (Message.author_mail == dm_dest_mail)))
+
 
 #    @staticmethod
 #    def delete_all():

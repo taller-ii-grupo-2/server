@@ -14,7 +14,6 @@ from app.exceptions import UserIsAlreadyInvited, UserIsNotInvited
 from app.associations import ADMINS, INVS
 from app.channels import Channel
 from app.words import Word
-from app.bots import Bot
 from app import constant
 
 
@@ -38,7 +37,6 @@ class Organization(db.Model):
     creator_user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
     channels = db.relationship('Channel', backref='organization', lazy=True)
     words = db.relationship('Word', backref='organization', lazy=True)
-    bots = db.relationship('Bot', backref='bot', lazy=True)
     invitations = db.relationship(
         'User',
         secondary=INVS,
@@ -332,10 +330,6 @@ class Organization(db.Model):
         for word in self.words:
             self.delete_invalid_word(word.word)
 
-    def add_bot(self, name, url, description):
-        """ add invalid bot to orga """
-        Bot.add_bot(name, url, description, self.id)
-
     @staticmethod
     def get_orgas():
         """ get all organizations """
@@ -382,3 +376,15 @@ class Organization(db.Model):
             org_and_words.append(o_w)
 
         return org_and_words
+
+    @staticmethod
+    def get_info_from(organization_name, channel_name):
+        """ get infor from given org/channel """
+        try:
+            organization_id = Organization.\
+                                get_organization_by_name(organization_name).id
+            channel = Channel.get_channel_with_name(channel_name,
+                                                    organization_id)
+            return channel.get_channel_info()
+        except InvalidChannel:
+            return ""
