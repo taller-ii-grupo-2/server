@@ -3,6 +3,7 @@ flask-sqlalchemy
 flask-migrate
 flask-script
 flask_restful
+flask-cors
 flask_jwt_extended
 psycopg2-binary
 gunicorn

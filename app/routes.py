@@ -3,6 +3,7 @@
 import json
 from flask import request, jsonify
 from flask_restful import Resource
+from flask_restful.utils import cors
 from flask_socketio import emit
 import sqlalchemy.exc as sql
 from flask_jwt_extended import jwt_required
@@ -543,6 +544,7 @@ class AdminLogin(Resource):
     """ manage login from admin webs """
 
     @classmethod
+    @cors.crossdomain(origin='*')
     def post(cls):
         """ login admins """
         content = request.get_json()
@@ -565,6 +567,7 @@ class AdminUsers(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def options(cls):
         """post method"""
 
@@ -579,6 +582,7 @@ class AdminUsers(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def post(cls):
         """post method"""
         content = request.get_json()
@@ -599,6 +603,7 @@ class AdminUsers(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def get(cls):
         """ login admins """
         users = User.get_users()
@@ -608,6 +613,7 @@ class AdminUsers(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def delete(cls):
         """delete method"""
         mail = request.args['mail']
@@ -623,6 +629,7 @@ class AdminUsers(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def put(cls):
         """delete method"""
         content = request.get_json()
@@ -661,6 +668,7 @@ class AdminOrgas(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def post(cls):
         """post method"""
         content = request.get_json(force=True)
@@ -684,6 +692,7 @@ class AdminOrgas(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def get(cls):
         """ login admins """
         orgas = Organization.get_orgas()
@@ -695,6 +704,7 @@ class AdminOrgas(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def delete(cls):
         """ delete orga"""
         org_name = request.args['name']
@@ -712,6 +722,7 @@ class AdminOrgas(Resource):
 
     @classmethod
     @jwt_required
+    @cors.crossdomain(origin='*')
     def put(cls):
         """delete method"""
         content = request.get_json()
