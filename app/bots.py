@@ -73,7 +73,14 @@ class Bot(db.Model):
         return Bot.query.filter_by(name=name,
                                    organization_name=org_name).first()
 
+    def update_bot(self, url, description, org_name):
+        """updates bot info"""
+        self.url = url
+        self.description = description
+        self.organization_name = org_name
+
     @staticmethod
-    def delete_bot(name, org_id):
-        """ deletes word """
-        Bot.query.filter_by(name=name, organization_id=org_id).delete()
+    def delete_bot(name):
+        """ deletes bot """
+        Bot.query.filter_by(name=name).delete()
+        db.session.commit()  # pylint: disable = E1101
