@@ -823,8 +823,39 @@ class AdminBots(Resource):
             bots_to_send.append({'name': bot.name,
                                  'url': bot.url,
                                  'description': bot.description,
-                                 'org_id': bot.organization_id})
+                                 'org_id': bot.organization_name})
         return bots_to_send
+
+    @classmethod
+    @jwt_required
+    def put(cls):
+        """modify bot"""
+        content = request.get_json(force=True)
+        name = content['name']
+        url = content['url']
+        description = content['description']
+        org_name = content['org_name']
+
+        bot = Bot.get_bot(name)
+        bot.update_bot(url, description, org_name)
+
+    @classmethod
+    @jwt_required
+    def delete(cls):
+        """ delete bot"""
+        name = request.args['name']
+
+        try:
+            Bot.delete_bot(name)
+            data = {'message': 'bot deleted'}
+
+            response = jsonify(data)
+            response.status_code = 200
+        # pylint: disable=broad-except
+        except Exception:
+            response = jsonify({'message': 'error deleting bot'})
+            response.status_code = 400
+        return response
 
 
 class UsersInfoForBot(Resource):
