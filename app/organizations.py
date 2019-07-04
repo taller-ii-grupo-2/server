@@ -388,3 +388,23 @@ class Organization(db.Model):
             return channel.get_channel_info()
         except InvalidChannel:
             return ""
+
+    def get_amount_of_users(self):
+        """retrieve amount of users"""
+        return len(self.users)
+
+    @staticmethod
+    def get_orgas_with_amount_of_users():
+        """ retrieve all orgas with amount of users"""
+
+        orgas = Organization.query.all()
+        org_and_users = []
+
+        for orga in orgas:
+            o_s = {
+                'orga': orga.name,
+                'users': orga.get_amount_of_users()
+            }
+            org_and_users.append(o_s)
+
+        return org_and_users

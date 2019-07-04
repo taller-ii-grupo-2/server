@@ -741,6 +741,17 @@ class AdminOrgas(Resource):
         return response
 
 
+class AdminOrgasUsers(Resource):
+    """ manage users in orgas from admin """
+    @classmethod
+    def get(cls):
+        """get amount of users per orga"""
+        orgas = Organization.get_orgas_with_amount_of_users()
+        response = jsonify(orgas)
+        response.status_code = 200
+        return response
+
+
 class InvalidWords(Resource):
     """manage invalid words """
     @classmethod
